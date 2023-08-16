@@ -9,6 +9,6 @@ namespace ne{
         const char *title;
     };
 
-    uint32_t create_window(WindowCreateInfo *windowInfo, GLFWwindow * window);
+    uint32_t create_window(WindowCreateInfo *windowInfo, GLFWwindow ** window);
     uint32_t destroy_window(GLFWwindow * window);
 }

@@ -5,16 +5,16 @@
 #include "constants.hpp"
 
 #include <cstdlib>
-
+#include <iostream>
 
 
 uint32_t ne::create_application(ne::Application *app){
     WindowCreateInfo windowInfo{};
-    windowInfo.height = 800;
-    windowInfo.width = 600;
+    windowInfo.height = 600;
+    windowInfo.width = 800;
     windowInfo.title = "Test";
 
-    ne::create_window(&windowInfo, app -> window);
+    ne::create_window(&windowInfo, &app -> window);
 
 
 
@@ -23,6 +23,7 @@ uint32_t ne::create_application(ne::Application *app){
 
 
 uint32_t ne::run_application(ne::Application app){
+    
     while(!glfwWindowShouldClose(app.window)){
         glfwPollEvents();
     }
