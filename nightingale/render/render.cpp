@@ -6,23 +6,28 @@
 #include<iostream>
 #include<cstring>
 #include<GLFW/glfw3.h>
+#include "device.hpp"
 #include "validation_layers.hpp"
 
-uint32_t ne::create_renderer(ne::Renderer *renderer, bool enableValidationLayers){
-
+uint32_t ne::create_renderer(GLFWwindow *window, ne::Renderer *renderer, bool enableValidationLayers){
     ne::create_instance(renderer, enableValidationLayers);
     if(enableValidationLayers){
         ne::create_debug_messenger(renderer -> instance, &renderer -> debugMessenger);
     }
+    ne::create_surface(window, renderer->instance, &renderer ->surface);
+    ne::create_device(renderer ->instance, renderer ->surface, &renderer -> device, enableValidationLayers, validationLayers);
+
     return NE_SUCCESS;
 }
 
 
 
 uint32_t ne::destroy_renderer(ne::Renderer renderer, bool enableValidationLayers){
+    ne::destroy_device(renderer.device);
     if(enableValidationLayers){
         DestroyDebugUtilsMessengerEXT(renderer.instance, renderer.debugMessenger, nullptr);
     }
+    vkDestroySurfaceKHR(renderer.instance, renderer.surface, nullptr);
     vkDestroyInstance(renderer.instance, nullptr);
     return NE_SUCCESS;
 }
@@ -86,3 +91,11 @@ uint32_t ne::create_instance(ne::Renderer *renderer, bool enableValidationLayers
     return NE_SUCCESS;
 }
 
+
+uint32_t ne::create_surface(GLFWwindow *window, VkInstance instance, VkSurfaceKHR *surface){
+    if (glfwCreateWindowSurface(instance, window, nullptr, surface) != VK_SUCCESS) {
+        throw std::runtime_error("failed to create window surface!");
+    }
+    return NE_SUCCESS;
+
+}

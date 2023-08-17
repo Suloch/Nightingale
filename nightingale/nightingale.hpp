@@ -4,6 +4,7 @@
 #include <cstdlib>
 #include <GLFW/glfw3.h>
 #include "render/render.hpp"
+#include "render/device.hpp"
 namespace ne{
 
     struct Application{

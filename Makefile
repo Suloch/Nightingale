@@ -23,7 +23,7 @@ INC_FLAGS := $(addprefix -I,$(INC_DIRS))
 CFLAGS = -std=c++17 -O2
 LDFLAGS = -lglfw -lvulkan -ldl -lpthread -lX11 -lXxf86vm -lXrandr -lXi
 
-CPPFLAGS := $(INC_FLAGS) $(CFLAGS) $(LDFLAGS) -MMD -MP 
+CPPFLAGS := $(INC_FLAGS) $(CFLAGS) $(LDFLAGS) -MMD -MP -g
 
 
 $(BUILD_DIR)/$(TARGET_EXEC): $(OBJS)

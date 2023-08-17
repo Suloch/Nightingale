@@ -17,7 +17,7 @@ uint32_t ne::create_application(ne::Application *app){
     app -> renderer.engine_name = NE_NAME;
     app -> renderer.application_name = "Test";
     ne::create_window(&windowInfo, &app -> window);
-    ne::create_renderer(&app -> renderer, true);
+    ne::create_renderer(app ->window, &app -> renderer, true);
 
 
     return NE_SUCCESS;
