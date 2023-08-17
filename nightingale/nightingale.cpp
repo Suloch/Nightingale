@@ -33,7 +33,7 @@ uint32_t ne::run_application(ne::Application app){
 }
 
 uint32_t ne::destroy_application(ne::Application app){
-    ne::destroy_renderer(app.renderer);
+    ne::destroy_renderer(app.renderer, true);
     ne::destroy_window(app.window);
     return NE_SUCCESS;
 }
