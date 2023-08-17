@@ -14,8 +14,10 @@ uint32_t ne::create_application(ne::Application *app){
     windowInfo.width = 800;
     windowInfo.title = "Test";
 
+    app -> renderer.engine_name = NE_NAME;
+    app -> renderer.application_name = "Test";
     ne::create_window(&windowInfo, &app -> window);
-
+    ne::create_renderer(&app -> renderer, true);
 
 
     return NE_SUCCESS;
@@ -31,7 +33,7 @@ uint32_t ne::run_application(ne::Application app){
 }
 
 uint32_t ne::destroy_application(ne::Application app){
-
+    ne::destroy_renderer(app.renderer);
     ne::destroy_window(app.window);
     return NE_SUCCESS;
 }

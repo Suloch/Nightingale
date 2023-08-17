@@ -1,7 +1,7 @@
 
 
 # include "../nightingale/nightingale.hpp"
-
+#include<iostream>
 
 int main(){
     ne::Application app;
