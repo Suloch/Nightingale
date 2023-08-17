@@ -16,6 +16,8 @@ uint32_t ne::create_renderer(GLFWwindow *window, ne::Renderer *renderer, bool en
     }
     ne::create_surface(window, renderer->instance, &renderer ->surface);
     ne::create_device(renderer ->instance, renderer ->surface, &renderer -> device, enableValidationLayers, validationLayers);
+    ne::create_swap_chain(window, &renderer -> swap_chain, renderer->device.physical_device, renderer->device.device, renderer->surface);
+    ne::create_image_views(renderer->device.device, &renderer->swap_chain);
 
     return NE_SUCCESS;
 }
@@ -23,6 +25,10 @@ uint32_t ne::create_renderer(GLFWwindow *window, ne::Renderer *renderer, bool en
 
 
 uint32_t ne::destroy_renderer(ne::Renderer renderer, bool enableValidationLayers){
+    for (auto image_view : renderer.swap_chain.image_views) {
+        vkDestroyImageView(renderer.device.device, image_view, nullptr);
+    }
+    vkDestroySwapchainKHR(renderer.device.device, renderer.swap_chain.swapChain, nullptr);
     ne::destroy_device(renderer.device);
     if(enableValidationLayers){
         DestroyDebugUtilsMessengerEXT(renderer.instance, renderer.debugMessenger, nullptr);

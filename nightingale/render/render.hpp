@@ -4,6 +4,7 @@
 #include<vector>
 #include "device.hpp"
 #include <GLFW/glfw3.h>
+#include "swap_chain.hpp"
 namespace ne{
 
     struct Renderer{
@@ -11,6 +12,8 @@ namespace ne{
         VkSurfaceKHR surface;
         VkDebugUtilsMessengerEXT debugMessenger;
         Device device;
+        SwapChain swap_chain;
+
         const char *application_name;
         const char *engine_name;
     };
