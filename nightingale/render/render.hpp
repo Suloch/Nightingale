@@ -5,6 +5,7 @@
 #include "device.hpp"
 #include <GLFW/glfw3.h>
 #include "swap_chain.hpp"
+#include <map>
 #define MAX_FRAMES_IN_FLIGHT 2
 
 namespace ne{
@@ -22,7 +23,9 @@ namespace ne{
         std::vector<VkSemaphore> imageAvailableSemaphores;
         std::vector<VkSemaphore> renderFinishedSemaphores;
         std::vector<VkFence> inFlightFences;
+        std::map<std::string, VkPipeline> pipelines;    
         uint32_t current_frame;
+
         bool framebufferResized;
         const char *application_name;
         const char *engine_name;
@@ -40,7 +43,7 @@ namespace ne{
     uint32_t create_command_buffer(Renderer *renderer);
     uint32_t create_sync_objects(Renderer *renderer);
     void recordCommandBuffer(Renderer *renderer, VkCommandBuffer commandBuffer, uint32_t imageIndex, VkPipeline pipeline);
-    uint32_t render_frame(GLFWwindow *window, Renderer *renderer, VkPipeline pipeline);
+    uint32_t render_frame(GLFWwindow *window, Renderer *renderer);
     void framebufferResizeCallback(GLFWwindow* window, int width, int height);
     void recreateSwapChain(GLFWwindow *window, Renderer *renderer);
     void cleanupSwapChain(Renderer renderer);

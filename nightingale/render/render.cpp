@@ -24,7 +24,6 @@ uint32_t ne::create_renderer(GLFWwindow *window, ne::Renderer *renderer, bool en
     ne::create_swap_chain(window, &renderer -> swap_chain, renderer->device.physical_device, renderer->device.device, renderer->surface);
     ne::create_image_views(renderer->device.device, &renderer->swap_chain);
     ne::create_render_pass(renderer);
-    ne::create_command_pool(renderer);
     ne::create_frame_buffers(renderer);
     ne::create_graphice_pipline_layout(renderer->device.device, &renderer->pipeline_layout);
     ne::create_command_pool(renderer);
@@ -143,7 +142,7 @@ void ne::cleanupSwapChain(Renderer renderer){
     vkDestroySwapchainKHR(renderer.device.device, renderer.swap_chain.swapChain, nullptr);
 }
 
-uint32_t ne::render_frame(GLFWwindow *window, Renderer *renderer, VkPipeline pipeline){
+uint32_t ne::render_frame(GLFWwindow *window, Renderer *renderer){
     vkWaitForFences(renderer->device.device, 1, &renderer->inFlightFences[renderer->current_frame], VK_TRUE, UINT64_MAX);
     uint32_t imageIndex;
 
@@ -165,7 +164,7 @@ uint32_t ne::render_frame(GLFWwindow *window, Renderer *renderer, VkPipeline pip
     }
     vkResetFences(renderer->device.device, 1, &renderer->inFlightFences[renderer->current_frame]);
     vkResetCommandBuffer(renderer->command_buffers[renderer->current_frame], /*VkCommandBufferResetFlagBits*/ 0);
-    recordCommandBuffer(renderer, renderer->command_buffers[renderer->current_frame], imageIndex, pipeline);
+    recordCommandBuffer(renderer, renderer->command_buffers[renderer->current_frame], imageIndex, renderer->pipelines["default"]);
 
 
     VkSubmitInfo submitInfo{};
@@ -315,27 +314,26 @@ uint32_t ne::create_render_pass(ne::Renderer *renderer){
 
 
 uint32_t ne::destroy_renderer(ne::Renderer renderer, bool enableValidationLayers){
-    std::cout<<"destroying"<<std::endl;
     cleanupSwapChain(renderer);
-    std::cout<<"destroying2"<<std::endl;
-    
-    for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
-        vkDestroySemaphore(renderer.device.device, renderer.imageAvailableSemaphores[i], nullptr);
-        vkDestroySemaphore(renderer.device.device, renderer.imageAvailableSemaphores[i], nullptr);
-        vkDestroyFence(renderer.device.device, renderer.inFlightFences[i], nullptr);
+    for (const auto& [name, pipeline] : renderer.pipelines){
+        vkDestroyPipeline(renderer.device.device, pipeline, nullptr);
     }
-    std::cout<<"destroying3"<<std::endl;
-
-    vkDestroyCommandPool(renderer.device.device, renderer.command_pool, nullptr);
     vkDestroyPipelineLayout(renderer.device.device, renderer.pipeline_layout, nullptr);
     vkDestroyRenderPass(renderer.device.device, renderer.render_pass, nullptr);
+    for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
+        vkDestroySemaphore(renderer.device.device, renderer.imageAvailableSemaphores[i], nullptr);
+        vkDestroySemaphore(renderer.device.device, renderer.renderFinishedSemaphores[i], nullptr);
+        vkDestroyFence(renderer.device.device, renderer.inFlightFences[i], nullptr);
+    }
+
+    vkDestroyCommandPool(renderer.device.device, renderer.command_pool, nullptr);
+
     ne::destroy_device(renderer.device);
     if(enableValidationLayers){
         DestroyDebugUtilsMessengerEXT(renderer.instance, renderer.debugMessenger, nullptr);
     }
     vkDestroySurfaceKHR(renderer.instance, renderer.surface, nullptr);
     vkDestroyInstance(renderer.instance, nullptr);
-    std::cout<<"destroying4"<<std::endl;
 
     return NE_SUCCESS;
 }
