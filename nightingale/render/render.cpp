@@ -75,6 +75,10 @@ void ne::recordCommandBuffer(Renderer *renderer, VkCommandBuffer commandBuffer, 
 
     // VkBuffer vertexBuffers[] = {vertexBuffer};
     // VkDeviceSize offsets[] = {0};
+    Vertex2 temp{};
+    temp.pos = glm::vec2(0.5, 0);
+    temp.zoom = glm::float32(3);
+    vkCmdPushConstants(commandBuffer, renderer->pipeline_layout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(Vertex2), &temp);
     vkCmdDraw(commandBuffer, 3, 1, 0, 0);
     vkCmdEndRenderPass(commandBuffer);
 

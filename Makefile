@@ -43,5 +43,9 @@ $(BUILD_DIR)/%.cpp.o: %.cpp
 clean:
 	rm -r $(BUILD_DIR)
 
+shader:
+	glslc $(ENGINE_DIR)/render/shader/default/shader.vert -o $(BUILD_DIR)/$(ENGINE_DIR)/render/shader/default/vert.spv
+	glslc $(ENGINE_DIR)/render/shader/default/shader.frag -o $(BUILD_DIR)/$(ENGINE_DIR)/render/shader/default/frag.spv
+
 
 -include $(DEPS)

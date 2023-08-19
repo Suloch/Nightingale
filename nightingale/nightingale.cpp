@@ -24,17 +24,21 @@ uint32_t ne::create_application(ne::Application *app){
             app->renderer.render_pass, 
             app->renderer.pipeline_layout
         );
+    // VkPipeline pipeline = ne::create_piepline2(app->renderer.device.device, app->renderer.render_pass);
     app->renderer.pipelines.insert({"default", pipeline});
 
+    // glfwSetKeyCallback(app->window, key_callback);
     return NE_SUCCESS;
 }
 
 
 uint32_t ne::run_application(ne::Application app){
-    
+
     while(!glfwWindowShouldClose(app.window)){
         glfwPollEvents();
-        
+        if(glfwGetKey(app.window, GLFW_KEY_W) == GLFW_PRESS){
+            std::cout<<"hello"<<std::endl;
+        }
         ne::render_frame(app.window, &app.renderer);
     }
     vkDeviceWaitIdle(app.renderer.device.device);

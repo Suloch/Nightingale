@@ -43,9 +43,9 @@ namespace ne{
 
     struct Vertex2{
         glm::vec2 pos;
-        glm::int32 zoom;
+        glm::float32 zoom;
     };
-
+    VkPipeline create_piepline2(VkDevice device, VkRenderPass render_pass);
     VkPipeline create_graphice_pipline(VkDevice device, VkRenderPass render_pass, VkPipelineLayout pipeline_layout);
     void create_graphice_pipline_layout(VkDevice device, VkPipelineLayout *pipeline_layout);
     VkPushConstantRange create_push_constant();
