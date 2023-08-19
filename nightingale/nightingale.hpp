@@ -10,6 +10,7 @@ namespace ne{
     struct Application{
         GLFWwindow *window;
         Renderer renderer;
+        VkPipeline pipeline;
     };
 
     uint32_t create_application(Application *app);
