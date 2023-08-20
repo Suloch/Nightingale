@@ -25,7 +25,8 @@ uint32_t ne::create_renderer(GLFWwindow *window, ne::Renderer *renderer, bool en
     ne::create_image_views(renderer->device.device, &renderer->swap_chain);
     ne::create_render_pass(renderer);
     ne::create_frame_buffers(renderer);
-    ne::create_graphice_pipline_layout(renderer->device.device, &renderer->pipeline_layout);
+    ne::create_graphics_set_layout(renderer->device.device, &renderer->descriptor_set_layout);
+    ne::create_graphice_pipline_layout(renderer->device.device, &renderer->pipeline_layout, renderer->descriptor_set_layout);
     ne::create_command_pool(renderer);
     ne::create_command_buffer(renderer);
     ne::create_sync_objects(renderer);
@@ -322,6 +323,7 @@ uint32_t ne::destroy_renderer(ne::Renderer renderer, bool enableValidationLayers
     for (const auto& [name, pipeline] : renderer.pipelines){
         vkDestroyPipeline(renderer.device.device, pipeline, nullptr);
     }
+    vkDestroyDescriptorSetLayout(renderer.device.device, renderer.descriptor_set_layout, nullptr);
     vkDestroyPipelineLayout(renderer.device.device, renderer.pipeline_layout, nullptr);
     vkDestroyRenderPass(renderer.device.device, renderer.render_pass, nullptr);
     for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {

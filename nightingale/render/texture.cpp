@@ -3,8 +3,11 @@
 #include <stdexcept>
 #include "utils.hpp"
 #include "device.hpp"
+#define STB_IMAGE_IMPLEMENTATION
+#include <stb_image.h>
 
-void ne::transitionImageLayout(Device device, VkCommandPool commandPool, VkCommandBuffer commandBuffer,  VkImage image, VkFormat format, VkImageLayout oldLayout, VkImageLayout newLayout) {
+void ne::transitionImageLayout(Device device, VkCommandPool commandPool,  VkImage image, VkFormat format, VkImageLayout oldLayout, VkImageLayout newLayout) {
+        
         VkCommandBuffer commandBuffer = ne::beginSingleTimeCommands(commandPool, device);
 
         VkImageMemoryBarrier barrier{};
@@ -54,8 +57,8 @@ void ne::transitionImageLayout(Device device, VkCommandPool commandPool, VkComma
 void ne::copyBufferToImage(
     Device device, 
     VkCommandPool commandPool, 
-    VkCommandBuffer commandBuffer, 
-    VkBuffer buffer, VkImage image, 
+    VkBuffer buffer, 
+    VkImage image, 
     uint32_t width, 
     uint32_t height
     ) {
@@ -81,9 +84,29 @@ void ne::copyBufferToImage(
     endSingleTimeCommands(commandPool, commandBuffer, device);
 }
 
+ne::Texture ne::create_texture(
+    Device device, 
+    VkCommandPool commandPool,
+    uint32_t height,
+    uint32_t width,
+    uint32_t channels
+    ){
+    Texture texture =  create_texture_image(device, commandPool, height, width, channels);
+    create_texture_image_view(device, &texture);
+    create_sampler(device, &texture);
+
+    return texture;
+}
+
+void ne::destroy_texture(Device device, Texture texture){
+    vkDestroySampler(device.device, texture.sampler, nullptr);
+    vkDestroyImageView(device.device, texture.view, nullptr);
+    vkDestroyImage(device.device, texture.image, nullptr);
+    vkFreeMemory(device.device, texture.memory, nullptr);
+}
+
 ne::Texture ne::create_texture_image(
     Device device, 
-    VkCommandBuffer commandBuffer, 
     VkCommandPool commandPool,
     uint32_t height,
     uint32_t width,
@@ -128,6 +151,7 @@ ne::Texture ne::create_texture_image(
     stbi_image_free(pixels);
 
     createImage(
+        device,
         VK_FORMAT_R8G8B8A8_SRGB, 
         VK_IMAGE_TILING_OPTIMAL, 
         VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT, 
@@ -135,9 +159,9 @@ ne::Texture ne::create_texture_image(
         &texture
     );
 
-    transitionImageLayout(device, commandPool, commandBuffer, texture.image, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
-    copyBufferToImage(device, commandPool, commandBuffer, stagingBuffer, texture.image, static_cast<uint32_t>(texture.width), static_cast<uint32_t>(texture.height));
-    transitionImageLayout(device, commandPool, commandBuffer, texture.image, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+    transitionImageLayout(device, commandPool, texture.image, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+    copyBufferToImage(device, commandPool, stagingBuffer, texture.image, static_cast<uint32_t>(texture.width), static_cast<uint32_t>(texture.height));
+    transitionImageLayout(device, commandPool, texture.image, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 
     vkDestroyBuffer(device.device, stagingBuffer, nullptr);
     vkFreeMemory(device.device, stagingBufferMemory, nullptr);
@@ -184,4 +208,54 @@ void ne::createImage(
     }
 
     vkBindImageMemory(device.device, tex->image, tex->memory, 0);
+}
+
+VkImageView ne::create_image_view(Device device, VkImage image, VkFormat format) {
+    VkImageViewCreateInfo viewInfo{};
+    viewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+    viewInfo.image = image;
+    viewInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
+    viewInfo.format = format;
+    viewInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+    viewInfo.subresourceRange.baseMipLevel = 0;
+    viewInfo.subresourceRange.levelCount = 1;
+    viewInfo.subresourceRange.baseArrayLayer = 0;
+    viewInfo.subresourceRange.layerCount = 1;
+
+    VkImageView imageView;
+    if (vkCreateImageView(device.device, &viewInfo, nullptr, &imageView) != VK_SUCCESS) {
+        throw std::runtime_error("failed to create texture image view!");
+    }
+
+    return imageView;
+}
+
+void ne::create_texture_image_view(Device device, Texture *tex) {
+    tex->view = create_image_view(device, tex->image, VK_FORMAT_R8G8B8A8_SRGB);
+}
+
+
+
+void ne::create_sampler(Device device, Texture *texture){
+    VkPhysicalDeviceProperties properties{};
+    vkGetPhysicalDeviceProperties(device.physical_device, &properties);
+
+    VkSamplerCreateInfo samplerInfo{};
+    samplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
+    samplerInfo.magFilter = VK_FILTER_LINEAR;
+    samplerInfo.minFilter = VK_FILTER_LINEAR;
+    samplerInfo.addressModeU = VK_SAMPLER_ADDRESS_MODE_REPEAT;
+    samplerInfo.addressModeV = VK_SAMPLER_ADDRESS_MODE_REPEAT;
+    samplerInfo.addressModeW = VK_SAMPLER_ADDRESS_MODE_REPEAT;
+    samplerInfo.anisotropyEnable = VK_TRUE;
+    samplerInfo.maxAnisotropy = properties.limits.maxSamplerAnisotropy;
+    samplerInfo.borderColor = VK_BORDER_COLOR_INT_OPAQUE_BLACK;
+    samplerInfo.unnormalizedCoordinates = VK_FALSE;
+    samplerInfo.compareEnable = VK_FALSE;
+    samplerInfo.compareOp = VK_COMPARE_OP_ALWAYS;
+    samplerInfo.mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR;
+
+    if (vkCreateSampler(device.device, &samplerInfo, nullptr, &texture->sampler) != VK_SUCCESS) {
+        throw std::runtime_error("failed to create texture sampler!");
+    }
 }

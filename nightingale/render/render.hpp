@@ -23,7 +23,9 @@ namespace ne{
         std::vector<VkSemaphore> imageAvailableSemaphores;
         std::vector<VkSemaphore> renderFinishedSemaphores;
         std::vector<VkFence> inFlightFences;
-        std::map<std::string, VkPipeline> pipelines;    
+        std::map<std::string, VkPipeline> pipelines;  
+        VkDescriptorSetLayout descriptor_set_layout;
+
         uint32_t current_frame;
 
         bool framebufferResized;

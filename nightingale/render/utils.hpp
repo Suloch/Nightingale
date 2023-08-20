@@ -14,4 +14,5 @@ namespace ne{
     uint32_t findMemoryType(VkPhysicalDevice device, uint32_t typeFilter, VkMemoryPropertyFlags properties);
     void endSingleTimeCommands(VkCommandPool commandPool, VkCommandBuffer commandBuffer, Device device) ;
     VkCommandBuffer beginSingleTimeCommands(VkCommandPool commandPool, Device device);
+    
 }
