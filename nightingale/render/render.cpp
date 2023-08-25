@@ -130,16 +130,15 @@ void ne::recreateSwapChain(GLFWwindow *window, Renderer *renderer) {
     ne::create_swap_chain(window, &renderer -> swap_chain, renderer->device.physical_device, renderer->device.device, renderer->surface);
     ne::create_image_views(renderer->device.device, &renderer->swap_chain);
     ne::create_frame_buffers(renderer);
+
 }
 
 
 
 void ne::cleanupSwapChain(Renderer renderer){
-    std::cout<<"Deleting swapchain"<<std::endl;
     for (auto framebuffer : renderer.frame_buffers) {
         vkDestroyFramebuffer(renderer.device.device, framebuffer, nullptr);
     }
-
     for (auto imageView : renderer.swap_chain.image_views) {
         vkDestroyImageView(renderer.device.device, imageView, nullptr);
     }

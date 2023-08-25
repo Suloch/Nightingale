@@ -32,16 +32,17 @@ uint32_t ne::create_application(ne::Application *app){
 }
 
 
-uint32_t ne::run_application(ne::Application app){
+uint32_t ne::run_application(ne::Application *app){
 
-    while(!glfwWindowShouldClose(app.window)){
+    while(!glfwWindowShouldClose(app->window)){
         glfwPollEvents();
-        if(glfwGetKey(app.window, GLFW_KEY_W) == GLFW_PRESS){
+        if(glfwGetKey(app->window, GLFW_KEY_W) == GLFW_PRESS){
             std::cout<<"hello"<<std::endl;
         }
-        ne::render_frame(app.window, &app.renderer);
+        ne::render_frame(app->window, &app->renderer);
+
     }
-    vkDeviceWaitIdle(app.renderer.device.device);
+    vkDeviceWaitIdle(app->renderer.device.device);
     return NE_SUCCESS;
 }
 
