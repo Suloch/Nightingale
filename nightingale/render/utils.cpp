@@ -1,6 +1,6 @@
 #include "utils.hpp"
 #include<stdexcept>
-
+#include<cstring>
 
 VkCommandBuffer ne::beginSingleTimeCommands(VkCommandPool commandPool, Device device) {
     VkCommandBufferAllocateInfo allocInfo{};
@@ -73,4 +73,88 @@ void ne::create_buffer(Device device, VkDeviceSize size, VkBufferUsageFlags usag
     }
 
     vkBindBufferMemory(device.device, buffer, bufferMemory, 0);
+}
+
+ne::Buffer ne::createVertexBuffer(VkCommandPool commandPool, Device device, const std::vector<Vertex> vertices) {
+        VkDeviceSize bufferSize = sizeof(vertices[0]) * vertices.size();
+
+        VkBuffer stagingBuffer;
+        VkDeviceMemory stagingBufferMemory;
+        create_buffer(
+            device,
+            bufferSize, 
+            VK_BUFFER_USAGE_TRANSFER_SRC_BIT, 
+            VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, 
+            stagingBuffer, 
+            stagingBufferMemory
+        );
+        void* data;
+        vkMapMemory(device.device, stagingBufferMemory, 0, bufferSize, 0, &data);
+            memcpy(data, vertices.data(), (size_t) bufferSize);
+        vkUnmapMemory(device.device, stagingBufferMemory);
+
+        
+        Buffer buffer;
+
+        create_buffer(
+            device, 
+            bufferSize, 
+            VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, 
+            VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, 
+            buffer.buffer, 
+            buffer.bufferMemory
+        );
+
+        copyBuffer(commandPool, device, stagingBuffer, buffer.buffer, bufferSize);
+
+        vkDestroyBuffer(device.device, stagingBuffer, nullptr);
+        vkFreeMemory(device.device, stagingBufferMemory, nullptr);
+
+        return buffer;
+}
+
+void ne::copyBuffer(VkCommandPool commandPool, Device device, VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size) {
+    VkCommandBuffer commandBuffer = beginSingleTimeCommands(commandPool, device);
+
+    VkBufferCopy copyRegion{};
+    copyRegion.size = size;
+    vkCmdCopyBuffer(commandBuffer, srcBuffer, dstBuffer, 1, &copyRegion);
+
+    endSingleTimeCommands(commandPool, commandBuffer, device);
+}
+
+ne::Buffer ne::createIndexBuffer(VkCommandPool commandPool, Device device, const std::vector<uint16_t> indices) {
+    VkDeviceSize bufferSize = sizeof(indices[0]) * indices.size();
+
+    VkBuffer stagingBuffer;
+    VkDeviceMemory stagingBufferMemory;
+    create_buffer(
+            device,
+            bufferSize, 
+            VK_BUFFER_USAGE_TRANSFER_SRC_BIT, 
+            VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, 
+            stagingBuffer, 
+            stagingBufferMemory
+        );
+
+    void* data;
+    vkMapMemory(device.device, stagingBufferMemory, 0, bufferSize, 0, &data);
+    memcpy(data, indices.data(), (size_t) bufferSize);
+    vkUnmapMemory(device.device, stagingBufferMemory);
+
+    Buffer index_buffer;
+    create_buffer(
+            device, 
+            bufferSize, 
+            VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT, 
+            VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, 
+            index_buffer.buffer, 
+            index_buffer.bufferMemory
+        );
+    copyBuffer(commandPool, device, stagingBuffer, index_buffer.buffer, bufferSize);
+
+    vkDestroyBuffer(device.device, stagingBuffer, nullptr);
+    vkFreeMemory(device.device, stagingBufferMemory, nullptr);
+
+    return index_buffer;
 }

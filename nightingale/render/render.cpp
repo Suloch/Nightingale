@@ -8,7 +8,6 @@
 #include<GLFW/glfw3.h>
 #include "device.hpp"
 #include "validation_layers.hpp"
-#include "pipeline.hpp"
 
 
 
@@ -37,7 +36,7 @@ uint32_t ne::create_renderer(GLFWwindow *window, ne::Renderer *renderer, bool en
     return NE_SUCCESS;
 }
 
-void ne::recordCommandBuffer(Renderer *renderer, VkCommandBuffer commandBuffer, uint32_t imageIndex, VkPipeline pipeline){
+void ne::recordCommandBuffer(Renderer *renderer, VkCommandBuffer commandBuffer, uint32_t imageIndex, VkPipeline pipeline, Buffer vertex_bufer, Buffer index_buffer){
     VkCommandBufferBeginInfo beginInfo{};
     beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
     beginInfo.flags = 0; // Optional
@@ -74,13 +73,17 @@ void ne::recordCommandBuffer(Renderer *renderer, VkCommandBuffer commandBuffer, 
     scissor.extent = renderer->swap_chain.extent;
     vkCmdSetScissor(commandBuffer, 0, 1, &scissor);
 
-    // VkBuffer vertexBuffers[] = {vertexBuffer};
-    // VkDeviceSize offsets[] = {0};
+    VkBuffer vertexBuffers[] = {vertex_bufer.buffer};
+    VkDeviceSize offsets[] = {0};
+    vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
+    
+    vkCmdBindIndexBuffer(commandBuffer, index_buffer.buffer, 0, VK_INDEX_TYPE_UINT16);
+
     Vertex2 temp{};
     temp.pos = glm::vec2(0.5, 0);
     temp.zoom = glm::float32(3);
     vkCmdPushConstants(commandBuffer, renderer->pipeline_layout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(Vertex2), &temp);
-    vkCmdDraw(commandBuffer, 3, 1, 0, 0);
+    vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(6), 1, 0, 0, 0);
     vkCmdEndRenderPass(commandBuffer);
 
     if (vkEndCommandBuffer(commandBuffer) != VK_SUCCESS) {
@@ -146,7 +149,7 @@ void ne::cleanupSwapChain(Renderer renderer){
     vkDestroySwapchainKHR(renderer.device.device, renderer.swap_chain.swapChain, nullptr);
 }
 
-uint32_t ne::render_frame(GLFWwindow *window, Renderer *renderer){
+uint32_t ne::render_frame(GLFWwindow *window, Renderer *renderer, Buffer vertex_buffer, Buffer index_buffer){
     vkWaitForFences(renderer->device.device, 1, &renderer->inFlightFences[renderer->current_frame], VK_TRUE, UINT64_MAX);
     uint32_t imageIndex;
 
@@ -168,7 +171,7 @@ uint32_t ne::render_frame(GLFWwindow *window, Renderer *renderer){
     }
     vkResetFences(renderer->device.device, 1, &renderer->inFlightFences[renderer->current_frame]);
     vkResetCommandBuffer(renderer->command_buffers[renderer->current_frame], /*VkCommandBufferResetFlagBits*/ 0);
-    recordCommandBuffer(renderer, renderer->command_buffers[renderer->current_frame], imageIndex, renderer->pipelines["default"]);
+    recordCommandBuffer(renderer, renderer->command_buffers[renderer->current_frame], imageIndex, renderer->pipelines["default"], vertex_buffer, index_buffer);
 
 
     VkSubmitInfo submitInfo{};

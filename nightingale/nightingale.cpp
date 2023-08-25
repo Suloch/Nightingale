@@ -4,10 +4,10 @@
 #include "window/window.hpp"
 #include "constants.hpp"
 #include "render/pipeline.hpp"
-
 #include <cstdlib>
 #include <iostream>
-
+#include <thread>
+#include <chrono>
 
 uint32_t ne::create_application(ne::Application *app){
     WindowCreateInfo windowInfo{};
@@ -24,6 +24,8 @@ uint32_t ne::create_application(ne::Application *app){
             app->renderer.render_pass, 
             app->renderer.pipeline_layout
         );
+    
+    
     // VkPipeline pipeline = ne::create_piepline2(app->renderer.device.device, app->renderer.render_pass);
     app->renderer.pipelines.insert({"default", pipeline});
 
@@ -33,15 +35,27 @@ uint32_t ne::create_application(ne::Application *app){
 
 
 uint32_t ne::run_application(ne::Application *app){
-
+    const std::vector<Vertex> vertices = {
+        {{-0.5f, -0.5f}, {0.0f, 0.0f, 1.0f}, {1.0f, 0.0f}},
+        {{0.5f, -0.5f}, {0.0f, 0.0f, 1.0f}, {0.0f, 0.0f}},
+        {{0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}, {0.0f, 1.0f}},
+        {{-0.5f, 0.5f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}}
+    };
+    const std::vector<uint16_t> indices = {
+        0, 1, 2, 2, 3, 0
+    };
+    Buffer vertex_buffer = createVertexBuffer(app->renderer.command_pool, app->renderer.device, vertices);
+    Buffer index_buffer = createIndexBuffer(app->renderer.command_pool, app->renderer.device, indices);
     while(!glfwWindowShouldClose(app->window)){
         glfwPollEvents();
         if(glfwGetKey(app->window, GLFW_KEY_W) == GLFW_PRESS){
             std::cout<<"hello"<<std::endl;
         }
-        ne::render_frame(app->window, &app->renderer);
-
+        ne::render_frame(app->window, &app->renderer, vertex_buffer, index_buffer);
+        std::this_thread::sleep_for(std::chrono::milliseconds(20));
     }
+    vkDestroyBuffer(app->renderer.device.device, vertex_buffer.buffer, nullptr);
+    vkFreeMemory(app->renderer.device.device, vertex_buffer.bufferMemory, nullptr);
     vkDeviceWaitIdle(app->renderer.device.device);
     return NE_SUCCESS;
 }
