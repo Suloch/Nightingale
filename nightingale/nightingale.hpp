@@ -1,15 +1,19 @@
 #pragma once
 
 #include "gameobject/gameobject.hpp"
+#include "texture/texture.hpp"
+
 #include<map>
 #include<string>
+#include<vector>
+
 namespace nge{
     class Scene{
         public:
+            Scene(){}
             Scene(const char* name);
             ~Scene();
-            void addObject(GameObject object);
-            void removeObject(GameObject object);
+            std::vector<GameObject> gameObjects;
 
         private:
             const char *name;
@@ -25,9 +29,15 @@ namespace nge{
             ~Nightingale();
 
             void run();
+            void createTexture(const char* name, const char*filepath);
 
         private:
+            std::vector<Texture> textures;
+            
+            
             const char *name;
+            Device device;
+
     };
     
 }

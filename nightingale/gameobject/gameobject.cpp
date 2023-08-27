@@ -10,6 +10,18 @@ nge::GameObject::GameObject(){
     name = "GameObject";
 }
 
+nge::GameObject::GameObject(char *name){
+    GameObject();
+    this->name = name;
+}
+
+nge::GameObject::GameObject(char *name, float x, float y){
+    GameObject();
+    this->name = name;
+    this->x = x;
+    this->y = y;
+}
+
 nge::GameObject::~GameObject(){
     
 }

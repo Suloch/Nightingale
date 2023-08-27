@@ -11,12 +11,15 @@ namespace nge{
             float sx; //x-scale
             float sy; //y-scale
             float r; //rotation in radians
+            std::map<std::string, std::string> properties;
+
             GameObject();
+            GameObject(char *name);
+            GameObject(char *name, float x, float y);
             ~GameObject();
         
         private:
             char * name;
-            std::map<std::string, std::string> properties;
         
     };
 } // namespace nge

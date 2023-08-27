@@ -13,16 +13,26 @@ int main(){
     
     // create background
         // create a gameobject 
-    nge::GameObject bg_object = nge::GameObject();    
-        // create a texture
-    
-        // add texture property to gameobject
+        nge::GameObject bg_object = nge::GameObject("bg");    
 
+        // create a texture
+        app.createTexture("bg_tex", "textures/SET1_bakcground_day1.png");
+
+        // add texture property to gameobject
+        bg_object.properties["texture"] = "bg_tex";
+
+        // add object to the scene
+        app.scenes["default"].gameObjects.push_back(bg_object);
 
     // create platform
         // create gameobject for the platform
+        nge::GameObject plat_object = nge::GameObject("platform");
+
         // create collider for the platform
+        nge::Collider collider = nge::Collider("platform", 50, 100, 700, 50);
+
         // add collider property to the platform
+        plat_object.properties["collider"] = "platform";
 
         // create gameobjects for each tile and to the children of the platform
         // create textures need for every tile
