@@ -30,8 +30,6 @@ CPPFLAGS := $(INC_FLAGS) $(CFLAGS) $(LDFLAGS) -MMD -MP -g
 $(BUILD_DIR)/$(TARGET_EXEC): $(OBJS)
 	$(CXX) $(OBJS) -o $@ $(LDFLAGS)
 	mkdir -p $(BUILD_DIR)/$(ENGINE_DIR)/render/shader/default/
-	glslc $(ENGINE_DIR)/render/shader/default/shader.vert -o $(BUILD_DIR)/$(ENGINE_DIR)/render/shader/default/vert.spv
-	glslc $(ENGINE_DIR)/render/shader/default/shader.frag -o $(BUILD_DIR)/$(ENGINE_DIR)/render/shader/default/frag.spv
 
 
 # Build step for C++ source

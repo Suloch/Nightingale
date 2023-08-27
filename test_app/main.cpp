@@ -4,10 +4,20 @@
 #include<iostream>
 
 int main(){
-    ne::Application app;
-    ne::create_application(&app);
-    ne::run_application(&app); 
+    
+    // create background
 
-    ne::destroy_application(app);
+    // create platform
+
+    // create character
+
+    // create the render, physics and input requirements of the objects
+    nge::Nightingale app =  nge::Nightingale();
+
+
+    app.run();
+
+
     return 0;
+
 }
