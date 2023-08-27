@@ -15,10 +15,7 @@ namespace ne{
     };
     Texture create_texture_image(
         Device device, 
-        VkCommandPool commandPool,
-        uint32_t height,
-        uint32_t width,
-        uint32_t channels
+        VkCommandPool commandPool
     );
     void transitionImageLayout(
         Device device, 
@@ -49,10 +46,7 @@ namespace ne{
     VkImageView create_image_view(Device device, VkImage image, VkFormat format);
     Texture create_texture(
         Device device, 
-        VkCommandPool commandPool,
-        uint32_t height,
-        uint32_t width,
-        uint32_t channels
+        VkCommandPool commandPool
     );
 
     void destroy_texture(Device device, Texture texture);

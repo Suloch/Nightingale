@@ -25,7 +25,7 @@ uint32_t ne::create_renderer(GLFWwindow *window, ne::Renderer *renderer, bool en
     ne::create_render_pass(renderer);
     ne::create_frame_buffers(renderer);
     ne::create_graphics_set_layout(renderer->device.device, &renderer->descriptor_set_layout);
-    ne::create_graphice_pipline_layout(renderer->device.device, &renderer->pipeline_layout, renderer->descriptor_set_layout);
+    ne::create_graphice_pipline_layout(renderer->device.device, &renderer->pipeline_layout, &renderer->descriptor_set_layout);
     ne::create_command_pool(renderer);
     ne::create_command_buffer(renderer);
     ne::create_sync_objects(renderer);
@@ -36,7 +36,7 @@ uint32_t ne::create_renderer(GLFWwindow *window, ne::Renderer *renderer, bool en
     return NE_SUCCESS;
 }
 
-void ne::recordCommandBuffer(Renderer *renderer, VkCommandBuffer commandBuffer, uint32_t imageIndex, VkPipeline pipeline, Buffer vertex_bufer, Buffer index_buffer){
+void ne::recordCommandBuffer(Renderer *renderer, VkCommandBuffer commandBuffer, uint32_t imageIndex, VkPipeline pipeline, Buffer vertex_bufer, Buffer index_buffer, std::vector<VkDescriptorSet> descriptorSets, float x){
     VkCommandBufferBeginInfo beginInfo{};
     beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
     beginInfo.flags = 0; // Optional
@@ -78,9 +78,10 @@ void ne::recordCommandBuffer(Renderer *renderer, VkCommandBuffer commandBuffer, 
     vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
     
     vkCmdBindIndexBuffer(commandBuffer, index_buffer.buffer, 0, VK_INDEX_TYPE_UINT16);
+    vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, renderer->pipeline_layout, 0, 1, &descriptorSets[renderer->current_frame], 0, nullptr);
 
     Vertex2 temp{};
-    temp.pos = glm::vec2(0.5, 0);
+    temp.pos = glm::vec2(x, 0);
     temp.zoom = glm::float32(3);
     vkCmdPushConstants(commandBuffer, renderer->pipeline_layout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(Vertex2), &temp);
     vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(6), 1, 0, 0, 0);
@@ -149,7 +150,7 @@ void ne::cleanupSwapChain(Renderer renderer){
     vkDestroySwapchainKHR(renderer.device.device, renderer.swap_chain.swapChain, nullptr);
 }
 
-uint32_t ne::render_frame(GLFWwindow *window, Renderer *renderer, Buffer vertex_buffer, Buffer index_buffer){
+uint32_t ne::render_frame(GLFWwindow *window, Renderer *renderer, Buffer vertex_buffer, Buffer index_buffer, std::vector<VkDescriptorSet> descriptorSets, float x){
     vkWaitForFences(renderer->device.device, 1, &renderer->inFlightFences[renderer->current_frame], VK_TRUE, UINT64_MAX);
     uint32_t imageIndex;
 
@@ -171,7 +172,7 @@ uint32_t ne::render_frame(GLFWwindow *window, Renderer *renderer, Buffer vertex_
     }
     vkResetFences(renderer->device.device, 1, &renderer->inFlightFences[renderer->current_frame]);
     vkResetCommandBuffer(renderer->command_buffers[renderer->current_frame], /*VkCommandBufferResetFlagBits*/ 0);
-    recordCommandBuffer(renderer, renderer->command_buffers[renderer->current_frame], imageIndex, renderer->pipelines["default"], vertex_buffer, index_buffer);
+    recordCommandBuffer(renderer, renderer->command_buffers[renderer->current_frame], imageIndex, renderer->pipelines["default"], vertex_buffer, index_buffer, descriptorSets, x);
 
 
     VkSubmitInfo submitInfo{};

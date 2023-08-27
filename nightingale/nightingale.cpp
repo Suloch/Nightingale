@@ -4,6 +4,7 @@
 #include "window/window.hpp"
 #include "constants.hpp"
 #include "render/pipeline.hpp"
+#include "render/descripter_set.hpp"
 #include <cstdlib>
 #include <iostream>
 #include <thread>
@@ -46,16 +47,26 @@ uint32_t ne::run_application(ne::Application *app){
     };
     Buffer vertex_buffer = createVertexBuffer(app->renderer.command_pool, app->renderer.device, vertices);
     Buffer index_buffer = createIndexBuffer(app->renderer.command_pool, app->renderer.device, indices);
+    Texture texture = create_texture(app->renderer.device, app->renderer.command_pool);
+    VkDescriptorPool descriptor_pool = createDescriptorPool(MAX_FRAMES_IN_FLIGHT, app->renderer.device);
+    VkDescriptorSetLayout layout;
+    create_graphics_set_layout(app->renderer.device.device, &layout);
+
+    std::vector<VkDescriptorSet> descriptorSets = createDescriptorSets(MAX_FRAMES_IN_FLIGHT, app->renderer.device, descriptor_pool, texture, layout);
+    float x = 0;
     while(!glfwWindowShouldClose(app->window)){
         glfwPollEvents();
         if(glfwGetKey(app->window, GLFW_KEY_W) == GLFW_PRESS){
-            std::cout<<"hello"<<std::endl;
+            x += 0.1;
         }
-        ne::render_frame(app->window, &app->renderer, vertex_buffer, index_buffer);
+        ne::render_frame(app->window, &app->renderer, vertex_buffer, index_buffer, descriptorSets, x);
         std::this_thread::sleep_for(std::chrono::milliseconds(20));
     }
+
     vkDestroyBuffer(app->renderer.device.device, vertex_buffer.buffer, nullptr);
     vkFreeMemory(app->renderer.device.device, vertex_buffer.bufferMemory, nullptr);
+    destroy_texture(app->renderer.device, texture);
+
     vkDeviceWaitIdle(app->renderer.device.device);
     return NE_SUCCESS;
 }

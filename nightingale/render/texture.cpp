@@ -86,12 +86,10 @@ void ne::copyBufferToImage(
 
 ne::Texture ne::create_texture(
     Device device, 
-    VkCommandPool commandPool,
-    uint32_t height,
-    uint32_t width,
-    uint32_t channels
+    VkCommandPool commandPool
     ){
-    Texture texture =  create_texture_image(device, commandPool, height, width, channels);
+    int height, width, channels;
+    Texture texture =  create_texture_image(device, commandPool);
     create_texture_image_view(device, &texture);
     create_sampler(device, &texture);
 
@@ -107,17 +105,11 @@ void ne::destroy_texture(Device device, Texture texture){
 
 ne::Texture ne::create_texture_image(
     Device device, 
-    VkCommandPool commandPool,
-    uint32_t height,
-    uint32_t width,
-    uint32_t channels
+    VkCommandPool commandPool
     ){
     Texture texture{};
-    texture.height = height;
-    texture.width = width;
-    texture.channels = channels;
     stbi_uc* pixels = stbi_load(
-        "textures/texture.jpg", 
+        "textures/texture.jpeg", 
         &texture.width, 
         &texture.height, 
         &texture.channels, 

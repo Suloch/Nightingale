@@ -46,8 +46,8 @@ namespace ne{
     uint32_t create_command_pool(Renderer *renderer);
     uint32_t create_command_buffer(Renderer *renderer);
     uint32_t create_sync_objects(Renderer *renderer);
-    void recordCommandBuffer(Renderer *renderer, VkCommandBuffer commandBuffer, uint32_t imageIndex, VkPipeline pipeline, Buffer vertex_buffer, Buffer index_buffer);
-    uint32_t render_frame(GLFWwindow *window, Renderer *renderer, Buffer vertex_buffer, Buffer index_buffer);
+    void recordCommandBuffer(Renderer *renderer, VkCommandBuffer commandBuffer, uint32_t imageIndex, VkPipeline pipeline, Buffer vertex_buffer, Buffer index_buffer, std::vector<VkDescriptorSet> descriptorSets, float x);
+    uint32_t render_frame(GLFWwindow *window, Renderer *renderer, Buffer vertex_buffer, Buffer index_buffer, std::vector<VkDescriptorSet> descriptorSets, float x);
     void framebufferResizeCallback(GLFWwindow* window, int width, int height);
     void recreateSwapChain(GLFWwindow *window, Renderer *renderer);
     void cleanupSwapChain(Renderer renderer);
