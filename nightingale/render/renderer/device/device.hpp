@@ -30,9 +30,9 @@ namespace nge{
             void createLogicalDevice();
             bool isDeviceSuitable();
             bool checkExtensionSupport();
-
-
-
+            void createInstance();
+            bool checkValidationLayerSupport();
+            void populateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT& createInfo);
         public:
             VkPhysicalDevice physical;
             VkDevice device;
@@ -42,18 +42,24 @@ namespace nge{
             VkInstance instance;
             VkCommandPool commandPool;
 
-            std::vector<const char*>validationLayers;
+            
             bool validationEnabled;
-            Device(){}
-            Device(VkInstance instance, VkSurfaceKHR surface, bool validation, std::vector<const char*>validationLayers);
-            ~Device();
+            std::vector<const char*>validationLayers;
 
+            static Device& getInstance(){
+                static Device device;
+                return device;
+            }
+            Device(){};
+            ~Device();
+            
+            void init(bool validationEnabled, std::vector<const char*>validationLayers);
             QueueFamilyIndices findQueueFamilyIndices();
             SwapChainSupportDetails querySwapChainSupport();
-
-            Device& operator=(Device other){
-                
-                return *this;
-            }
+            static  VkBool32 VKAPI_CALL debugCallback(
+                VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
+                VkDebugUtilsMessageTypeFlagsEXT messageType,
+                const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData,
+                void* pUserData);
     };
 }

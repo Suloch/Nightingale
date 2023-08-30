@@ -29,10 +29,10 @@ int main(){
         nge::GameObject plat_object = nge::GameObject("platform");
 
         // create collider for the platform
-        nge::Collider collider = nge::Collider("platform", 50, 100, 700, 50);
+        // nge::Collider collider = nge::Collider("platform", 50, 100, 700, 50);
 
         // add collider property to the platform
-        plat_object.properties["collider"] = "platform";
+        // plat_object.properties["collider"] = "platform";
 
         // create gameobjects for each tile and to the children of the platform
         // create textures need for every tile
