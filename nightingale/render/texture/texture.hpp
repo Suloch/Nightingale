@@ -27,7 +27,7 @@ namespace nge{
             void createSampler();
             
         public:
-            Texture(Device& device, const char* name, const char* filepath);
+            Texture(VkDevice device, const char* name, const char* filepath);
             ~Texture();
     };
 }

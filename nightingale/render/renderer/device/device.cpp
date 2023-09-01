@@ -7,20 +7,21 @@
 #include<cstring>
 #include<iostream>
 
-void nge::Device::init(bool validationEnabled, std::vector<const char*>validationLayers){
+nge::Device::Device(bool validationEnabled, std::vector<const char*>validationLayers){
 
     this->validationEnabled = validationEnabled;
     this->validationLayers = validationLayers;
     
     createInstance();
+        
     
-    surface = Window().getInstance().createSurface(instance);
-    
-    pickPhysicalDevice();
-    
-    createLogicalDevice();
 
     Logger::getInstance().log("Device created!");
+}
+
+void nge::Device::create(){
+    pickPhysicalDevice();
+    createLogicalDevice();
 }
 
 bool nge::Device::checkValidationLayerSupport() {
@@ -108,6 +109,7 @@ void nge::Device::createInstance(){
 }
 
 nge::Device::~Device(){
+
     vkDestroyDevice(device, nullptr);
 
     Logger::getInstance().log("Device destroyed!");

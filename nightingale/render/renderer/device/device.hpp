@@ -41,19 +41,17 @@ namespace nge{
             VkSurfaceKHR surface;
             VkInstance instance;
             VkCommandPool commandPool;
-
-            
+            VkSwapchainKHR swapchain;
+            std::vector<VkImageView> image_views;
+            std::vector<VkFramebuffer> frameBuffers;
+            void create();
             bool validationEnabled;
             std::vector<const char*>validationLayers;
 
-            static Device& getInstance(){
-                static Device device;
-                return device;
-            }
-            Device(){};
-            ~Device();
             
-            void init(bool validationEnabled, std::vector<const char*>validationLayers);
+            Device(bool validationEnabled, std::vector<const char*>validationLayers);
+            ~Device();
+
             QueueFamilyIndices findQueueFamilyIndices();
             SwapChainSupportDetails querySwapChainSupport();
             static  VkBool32 VKAPI_CALL debugCallback(

@@ -13,24 +13,20 @@ namespace nge{
     class Window{
 
         public:
-            static Window& getInstance(){
-                static Window w;
-                return w;
-            }
-            VkSwapchainKHR swapchain;
             GLFWwindow *window;
             
             std::vector<VkImage> images;
             VkFormat format;
             VkExtent2D extent;
-            std::vector<VkImageView> image_views;
 
-            void init(char *title, int height, int width);
-            void destroy(VkDevice device);
-            void run();
             VkSurfaceKHR createSurface(VkInstance instance);
-            void createImageViews(VkDevice device);
-            void createSwapChain(
+            std::vector<VkImageView> createImageViews(VkDevice device);
+            std::vector<VkFramebuffer> createFrameBuffers(VkDevice device, std::vector<VkImageView> imageViews, VkRenderPass renderpass);
+            
+            Window(const char *title, int height, int width);
+            ~Window();
+
+            VkSwapchainKHR createSwapChain(
                 VkPhysicalDevice physical_device, 
                 VkDevice device, 
                 VkSurfaceKHR surface,
@@ -40,7 +36,7 @@ namespace nge{
                 std::optional<uint32_t> graphicsFamily,
                 std::optional<uint32_t> presentFamily
             );
-            Window(){}
+
 
         private:
             VkSurfaceFormatKHR surfaceFormat;

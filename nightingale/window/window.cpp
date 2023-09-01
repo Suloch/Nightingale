@@ -69,7 +69,7 @@ for (const auto& availableFormat : available_formats) {
     surfaceFormat = available_formats[0];
 }
 
-void nge::Window::createSwapChain(
+VkSwapchainKHR nge::Window::createSwapChain(
     VkPhysicalDevice physical_device, 
     VkDevice device, 
     VkSurfaceKHR surface,
@@ -114,7 +114,7 @@ void nge::Window::createSwapChain(
     createInfo.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
     createInfo.presentMode = presentMode;
     createInfo.clipped = VK_TRUE;
-
+    VkSwapchainKHR swapchain;
     if (vkCreateSwapchainKHR(device, &createInfo, nullptr, &swapchain) != VK_SUCCESS) {
         throw std::runtime_error("failed to create swap chain!");
     }
@@ -125,6 +125,8 @@ void nge::Window::createSwapChain(
 
     format = surfaceFormat.format;
     extent = extent;
+
+    return swapchain;
 
 }
 
@@ -148,17 +150,20 @@ VkImageView nge::Window::createImageView(VkDevice device, VkImage image, VkForma
     return imageView;
 }
 
-void nge::Window::createImageViews(VkDevice device) {
-    image_views.resize(images.size());
+std::vector<VkImageView> nge::Window::createImageViews(VkDevice device) {
+    std::vector<VkImageView> imageViews;
+    imageViews.resize(images.size());
 
     for (size_t i = 0; i < images.size(); i++) {
-        image_views[i] = createImageView(device, images[i], format);
+        imageViews[i] = createImageView(device, images[i], format);
     }
+
+    return imageViews;
 
 }
 
 
-void nge::Window::init(char *title, int height, int width){
+nge::Window::Window(const char *title, int height, int width){
     
     glfwInit();
 
@@ -169,16 +174,27 @@ void nge::Window::init(char *title, int height, int width){
 
 }
 
+std::vector<VkFramebuffer> nge::Window::createFrameBuffers(VkDevice device, std::vector<VkImageView> imageViews, VkRenderPass renderpass){
+    std::vector<VkFramebuffer> frameBuffers;
+     frameBuffers.resize(imageViews.size());
 
+    for (size_t i = 0; i < imageViews.size(); i++) {
+        VkImageView attachments[] = {
+            imageViews[i]
+        };
 
-void nge::Window::destroy(VkDevice device){
-    glfwDestroyWindow(window);
-    glfwTerminate();
+        VkFramebufferCreateInfo framebufferInfo{};
+        framebufferInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
+        framebufferInfo.renderPass = renderpass;
+        framebufferInfo.attachmentCount = 1;
+        framebufferInfo.pAttachments = attachments;
+        framebufferInfo.width = extent.width;
+        framebufferInfo.height = extent.height;
+        framebufferInfo.layers = 1;
 
-    
-    for (auto imageView : image_views) {
-        vkDestroyImageView(device, imageView, nullptr);
+        if (vkCreateFramebuffer(device, &framebufferInfo, nullptr, &frameBuffers[i]) != VK_SUCCESS) {
+            throw std::runtime_error("failed to create framebuffer!");
+        }
     }
-    vkDestroySwapchainKHR(device, swapchain, nullptr);
-
+    return frameBuffers;
 }

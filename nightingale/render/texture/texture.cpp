@@ -5,7 +5,8 @@
 #include <stb_image.h>
 #include <stdexcept>
 
-nge::Texture::Texture(Device& device, const char* name, const char* filepath):device(device){
+nge::Texture::Texture(VkDevice device, const char* name, const char* filepath):device(device){
+    this->device = device;
     this->commandPool = commandPool;
     this->name = name;
     this->path = filepath;
