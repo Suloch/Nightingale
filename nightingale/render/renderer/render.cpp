@@ -8,9 +8,8 @@ void nge::renderBuffer(
     Command *command,
     PipelineLayout *pipelineLayout, 
     Pipeline *pipeline, 
-    VkCommandBuffer cBuffer,  
     VkRenderPass renderPass,
-    GameObjectBuffer buffer,
+    GameObjectBuffer *buffer,
     std::vector<VkDescriptorSet> descriptorSets,
     int currentFrame
 ){
@@ -28,18 +27,7 @@ void nge::renderBuffer(
 
 
     if (result == VK_ERROR_OUT_OF_DATE_KHR) {
-        SwapChainSupportDetails details = device->querySwapChainSupport();
-        QueueFamilyIndices indices = device->findQueueFamilyIndices();
-        window->reCreateSwapChain(
-            device->physical,
-            device->device,
-            device->surface,
-            details.capabilities,
-            details.formats,
-            details.present_modes,
-            indices.graphicsFamily,
-            indices.presentFamily
-        );
+        reCreateSwapChain(window, device, renderPass);
         return ;
     } else if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR) {
         throw std::runtime_error("failed to acquire swap chain image!");
@@ -93,18 +81,7 @@ void nge::renderBuffer(
     result = vkQueuePresentKHR(device->present, &presentInfo);
     if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || device->framebufferResized) {
         device->framebufferResized = false;
-        SwapChainSupportDetails details = device->querySwapChainSupport();
-        QueueFamilyIndices indices = device->findQueueFamilyIndices();
-        window->reCreateSwapChain(
-            device->physical,
-            device->device,
-            device->surface,
-            details.capabilities,
-            details.formats,
-            details.present_modes,
-            indices.graphicsFamily,
-            indices.presentFamily
-        );
+        reCreateSwapChain(window, device, renderPass);
     } else if (result != VK_SUCCESS) {
         throw std::runtime_error("failed to present swap chain image!");
     }
@@ -117,7 +94,7 @@ void nge::recordCommandBuffer(
     Pipeline *pipeline, 
     VkCommandBuffer cBuffer,  
     VkRenderPass renderPass,
-    GameObjectBuffer buffer,
+    GameObjectBuffer *buffer,
     VkDescriptorSet descriptorSet,
     uint32_t imageIndex
 ){
@@ -158,11 +135,11 @@ void nge::recordCommandBuffer(
     scissor.extent = device->extent;
     vkCmdSetScissor(cBuffer, 0, 1, &scissor);
 
-    VkBuffer vertexBuffers[] = {buffer.vertexBuffer};
+    VkBuffer vertexBuffers[] = {buffer->vertexBuffer};
     VkDeviceSize offsets[] = {0};
     vkCmdBindVertexBuffers(cBuffer, 0, 1, vertexBuffers, offsets);
     
-    vkCmdBindIndexBuffer(cBuffer, buffer.indexBuffer, 0, VK_INDEX_TYPE_UINT16);
+    vkCmdBindIndexBuffer(cBuffer, buffer->indexBuffer, 0, VK_INDEX_TYPE_UINT16);
     vkCmdBindDescriptorSets(cBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout->layout, 0, 1, &descriptorSet, 0, nullptr);
 
     Vertex2 temp{};
@@ -176,4 +153,44 @@ void nge::recordCommandBuffer(
         throw std::runtime_error("failed to record command buffer!");
     }
 
+}
+
+void nge::reCreateSwapChain(Window *window, Device *device, VkRenderPass renderPass){
+    int width = 0, height = 0;
+    glfwGetFramebufferSize(window->window, &width, &height);
+    while (width == 0 || height == 0) {
+        glfwGetFramebufferSize(window->window, &width, &height);
+        glfwWaitEvents();
+    }
+
+    vkDeviceWaitIdle(device->device);
+
+    cleanSwapChain(window, device);
+    SwapChainSupportDetails details = device->querySwapChainSupport();
+    QueueFamilyIndices indices = device->findQueueFamilyIndices();
+    device->swapchain = window->createSwapChain(
+        device->physical,
+        device->device,
+        device->surface,
+        details.capabilities,
+        details.formats,
+        details.present_modes,
+        indices.graphicsFamily,
+        indices.presentFamily
+    );
+    device->image_views = window->createImageViews(device->device);
+    device->frameBuffers = window->createFrameBuffers(device->device, device->image_views, renderPass);
+
+}
+
+
+void nge::cleanSwapChain(Window *window, Device *device){
+    for (auto framebuffer : device->frameBuffers) {
+        vkDestroyFramebuffer(device->device, framebuffer, nullptr);
+    }
+    for (auto imageView : device->image_views) {
+        vkDestroyImageView(device->device, imageView, nullptr);
+    }
+
+    vkDestroySwapchainKHR(device->device, device->swapchain, nullptr);
 }

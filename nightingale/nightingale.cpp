@@ -6,10 +6,6 @@
 #include<thread>
 #include<chrono>
 
-void nge::Nightingale::run(){
-    nge::Logger::getInstance().log("Inside run");
-
-}
 
 nge::Nightingale::Nightingale(int height, int width, const char* name){
     // init logger
@@ -17,7 +13,7 @@ nge::Nightingale::Nightingale(int height, int width, const char* name){
 
     std::vector<const char*>validationLayers;
 
-    device = new Device(true, validationLayers);
+    device = new Device(true, validationLayers, getRequiredExtensions(true));
     window = new Window(name, height, width);
 
     device->surface = window->createSurface(device->instance);
@@ -127,4 +123,13 @@ void nge::Nightingale::run(){
 void nge::Nightingale::createTexture(const char* name, const char* filepath){
     Texture *t = new Texture(device->graphics, device->physical, device->device, name, filepath);
     dSets[name] = createDescriptorsets(MAX_FRAMES_IN_FLIGHT, device->device, dPool, dLayout, t);
+}
+
+
+nge::Scene::Scene(const char *name){
+    this->name = name;
+}
+
+nge::Scene::~Scene(){
+
 }

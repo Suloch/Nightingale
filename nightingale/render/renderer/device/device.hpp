@@ -34,6 +34,7 @@ namespace nge{
             bool checkValidationLayerSupport();
             void populateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT& createInfo);
         public:
+            std::vector<const char*> requiredExtensions;
             VkPhysicalDevice physical;
             VkDevice device;
             VkQueue graphics;
@@ -50,7 +51,7 @@ namespace nge{
             std::vector<const char*>validationLayers;
             bool framebufferResized = false;
             
-            Device(bool validationEnabled, std::vector<const char*>validationLayers);
+            Device(bool validationEnabled, std::vector<const char*>validationLayers, std::vector<const char*> requiredExtensions);
             ~Device();
 
             QueueFamilyIndices findQueueFamilyIndices();

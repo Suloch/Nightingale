@@ -33,7 +33,6 @@ namespace nge{
             void run();
             void createTexture(const char* name, const char*filepath);
             void loadScene(std::string name);
-
         private:
             std::map<std::string, std::vector<VkDescriptorSet>> dSets;
             std::vector<GameObjectBuffer *> buffers;

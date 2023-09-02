@@ -7,11 +7,11 @@
 #include<cstring>
 #include<iostream>
 
-nge::Device::Device(bool validationEnabled, std::vector<const char*>validationLayers){
+nge::Device::Device(bool validationEnabled, std::vector<const char*>validationLayers, std::vector<const char*> requiredExtensions){
 
     this->validationEnabled = validationEnabled;
     this->validationLayers = validationLayers;
-    
+    this->requiredExtensions = requiredExtensions;
     createInstance();
         
     
@@ -86,9 +86,9 @@ void nge::Device::createInstance(){
     createInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
     createInfo.pApplicationInfo = &appInfo;
 
-    auto extensions = getRequiredExtensions(validationEnabled);
-    createInfo.enabledExtensionCount = static_cast<uint32_t>(extensions.size());
-    createInfo.ppEnabledExtensionNames = extensions.data();
+    
+    createInfo.enabledExtensionCount = static_cast<uint32_t>(requiredExtensions.size());
+    createInfo.ppEnabledExtensionNames = requiredExtensions.data();
 
     VkDebugUtilsMessengerCreateInfoEXT debugCreateInfo{};
     if (validationEnabled) {

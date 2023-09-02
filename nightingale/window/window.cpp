@@ -4,7 +4,7 @@
 
 #include "window.hpp"
 
-std::vector<const char*> getRequiredExtensions(bool enableValidationLayers) {
+std::vector<const char*> nge::getRequiredExtensions(bool enableValidationLayers) {
     uint32_t glfwExtensionCount = 0;
     const char** glfwExtensions;
     glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
@@ -198,3 +198,5 @@ std::vector<VkFramebuffer> nge::Window::createFrameBuffers(VkDevice device, std:
     }
     return frameBuffers;
 }
+
+

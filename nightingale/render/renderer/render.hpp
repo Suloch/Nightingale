@@ -24,8 +24,16 @@ namespace nge{
     Pipeline *pipeline, 
     VkCommandBuffer cBuffer,  
     VkRenderPass renderPass,
-    GameObjectBuffer buffer,
+    GameObjectBuffer *buffer,
     VkDescriptorSet descriptorSet,
     uint32_t imageIndex
     );
+
+    void reCreateSwapChain(
+        Window *window,
+        Device *device,
+        VkRenderPass renderPass
+    );
+
+    void cleanSwapChain(Window *window, Device *device);
 }

@@ -7,8 +7,8 @@
 #include<optional>
 
 namespace nge{
-    std::vector<const char*> getRequiredExtensions(bool enableValidationLayers);
 
+    std::vector<const char*> getRequiredExtensions(bool enableValidationLayers);
 
     class Window{
 
@@ -27,16 +27,6 @@ namespace nge{
             ~Window();
 
             VkSwapchainKHR createSwapChain(
-                VkPhysicalDevice physical_device, 
-                VkDevice device, 
-                VkSurfaceKHR surface,
-                VkSurfaceCapabilitiesKHR capabilities,
-                std::vector<VkSurfaceFormatKHR> formats,
-                std::vector<VkPresentModeKHR> present_modes,
-                std::optional<uint32_t> graphicsFamily,
-                std::optional<uint32_t> presentFamily
-            );
-            VkSwapchainKHR reCreateSwapChain(
                 VkPhysicalDevice physical_device, 
                 VkDevice device, 
                 VkSurfaceKHR surface,
