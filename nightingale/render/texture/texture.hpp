@@ -7,12 +7,11 @@ namespace nge{
         private:
             VkImage image;
             VkDeviceMemory memory;
-            VkImageView view;
-            VkSampler sampler;
 
-            Device& device;
+            VkDevice device;
+            VkPhysicalDevice pDevice;
             VkCommandPool commandPool;
-
+            VkQueue graphics;
             int height;
             int width;
             int channels;
@@ -27,7 +26,9 @@ namespace nge{
             void createSampler();
             
         public:
-            Texture(VkDevice device, const char* name, const char* filepath);
+            VkImageView view;
+            VkSampler sampler;
+            Texture(VkQueue graphics, VkPhysicalDevice pDevice, VkDevice device, const char* name, const char* filepath);
             ~Texture();
     };
 }

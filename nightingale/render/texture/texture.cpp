@@ -5,7 +5,9 @@
 #include <stb_image.h>
 #include <stdexcept>
 
-nge::Texture::Texture(VkDevice device, const char* name, const char* filepath):device(device){
+nge::Texture::Texture(VkQueue graphics, VkPhysicalDevice pDevice, VkDevice device, const char* name, const char* filepath):device(device){
+    this->graphics=graphics;
+    this->pDevice = pDevice;
     this->device = device;
     this->commandPool = commandPool;
     this->name = name;
@@ -13,10 +15,10 @@ nge::Texture::Texture(VkDevice device, const char* name, const char* filepath):d
 }
 
 nge::Texture::~Texture(){
-    vkDestroySampler(device.device, sampler, nullptr);
-    vkDestroyImageView(device.device, view, nullptr);
-    vkDestroyImage(device.device, image, nullptr);
-    vkFreeMemory(device.device, memory, nullptr);
+    vkDestroySampler(device, sampler, nullptr);
+    vkDestroyImageView(device, view, nullptr);
+    vkDestroyImage(device, image, nullptr);
+    vkFreeMemory(device, memory, nullptr);
 }
 
 void nge::Texture::createTextureImage(){
@@ -38,6 +40,7 @@ void nge::Texture::createTextureImage(){
     VkDeviceMemory stagingBufferMemory;
     
     createBuffer(
+        pDevice,
         device, 
         imageSize, 
         VK_BUFFER_USAGE_TRANSFER_SRC_BIT, 
@@ -48,9 +51,9 @@ void nge::Texture::createTextureImage(){
 
 
     void* data;
-    vkMapMemory(device.device, stagingBufferMemory, 0, imageSize, 0, &data);
+    vkMapMemory(device, stagingBufferMemory, 0, imageSize, 0, &data);
         memcpy(data, pixels, static_cast<size_t>(imageSize));
-    vkUnmapMemory(device.device, stagingBufferMemory);
+    vkUnmapMemory(device, stagingBufferMemory);
 
     stbi_image_free(pixels);
 
@@ -65,8 +68,8 @@ void nge::Texture::createTextureImage(){
     copyBufferToImage(stagingBuffer);
     transitionImageLayout(VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 
-    vkDestroyBuffer(device.device, stagingBuffer, nullptr);
-    vkFreeMemory(device.device, stagingBufferMemory, nullptr);
+    vkDestroyBuffer(device, stagingBuffer, nullptr);
+    vkFreeMemory(device, stagingBufferMemory, nullptr);
 }
 
 
@@ -86,22 +89,22 @@ void nge::Texture::createImage(VkFormat format,  VkImageTiling tiling,  VkImageU
     imageInfo.samples = VK_SAMPLE_COUNT_1_BIT;
     imageInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 
-    if (vkCreateImage(device.device, &imageInfo, nullptr, &image) != VK_SUCCESS) {
+    if (vkCreateImage(device, &imageInfo, nullptr, &image) != VK_SUCCESS) {
         throw std::runtime_error("failed to create image!");
     }
     VkMemoryRequirements memRequirements;
-    vkGetImageMemoryRequirements(device.device, image, &memRequirements);
+    vkGetImageMemoryRequirements(device, image, &memRequirements);
 
     VkMemoryAllocateInfo allocInfo{};
     allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
     allocInfo.allocationSize = memRequirements.size;
-    allocInfo.memoryTypeIndex = findMemoryType(device.physical, memRequirements.memoryTypeBits, properties);
+    allocInfo.memoryTypeIndex = findMemoryType(pDevice, memRequirements.memoryTypeBits, properties);
 
-    if (vkAllocateMemory(device.device, &allocInfo, nullptr, &memory) != VK_SUCCESS) {
+    if (vkAllocateMemory(device, &allocInfo, nullptr, &memory) != VK_SUCCESS) {
         throw std::runtime_error("failed to allocate image memory!");
     }
 
-    vkBindImageMemory(device.device, image, memory, 0);
+    vkBindImageMemory(device, image, memory, 0);
 }
 
 
@@ -149,7 +152,7 @@ void nge::Texture::transitionImageLayout(VkFormat format, VkImageLayout oldLayou
         1, &barrier
     );
 
-    nge::endSingleTimeCommands(commandPool, commandBuffer, device);
+    nge::endSingleTimeCommands(commandPool, commandBuffer, device, graphics);
 }
 
 void nge::Texture::copyBufferToImage(VkBuffer buffer){
@@ -172,7 +175,7 @@ void nge::Texture::copyBufferToImage(VkBuffer buffer){
 
     vkCmdCopyBufferToImage(commandBuffer, buffer, image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &region);
 
-    endSingleTimeCommands(commandPool, commandBuffer, device);
+    endSingleTimeCommands(commandPool, commandBuffer, device, graphics);
 }
 
 
@@ -188,7 +191,7 @@ void nge::Texture::createTextureImageView(VkFormat format){
     viewInfo.subresourceRange.baseArrayLayer = 0;
     viewInfo.subresourceRange.layerCount = 1;
 
-    if (vkCreateImageView(device.device, &viewInfo, nullptr, &view) != VK_SUCCESS) {
+    if (vkCreateImageView(device, &viewInfo, nullptr, &view) != VK_SUCCESS) {
         throw std::runtime_error("failed to create texture image view!");
     }
 
@@ -196,7 +199,7 @@ void nge::Texture::createTextureImageView(VkFormat format){
 
 void nge::Texture::createSampler(){
     VkPhysicalDeviceProperties properties{};
-    vkGetPhysicalDeviceProperties(device.physical, &properties);
+    vkGetPhysicalDeviceProperties(pDevice, &properties);
 
     VkSamplerCreateInfo samplerInfo{};
     samplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
@@ -213,7 +216,7 @@ void nge::Texture::createSampler(){
     samplerInfo.compareOp = VK_COMPARE_OP_ALWAYS;
     samplerInfo.mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR;
 
-    if (vkCreateSampler(device.device, &samplerInfo, nullptr, &sampler) != VK_SUCCESS) {
+    if (vkCreateSampler(device, &samplerInfo, nullptr, &sampler) != VK_SUCCESS) {
         throw std::runtime_error("failed to create texture sampler!");
     }
 }

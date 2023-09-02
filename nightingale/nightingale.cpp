@@ -1,9 +1,7 @@
 
 #include "nightingale.hpp"
 #include "logger/logger.hpp"
-#include "window/window.hpp"
 #include "renderer/pass/renderpass.hpp"
-#include "render/renderer/device/device.hpp"
 
 #include<thread>
 #include<chrono>
@@ -52,6 +50,9 @@ nge::Nightingale::Nightingale(int height, int width, const char* name){
 
     command = new Command(device->device, indices.graphicsFamily);
 
+    dPool = createDescriptorPool(device->device, MAX_FRAMES_IN_FLIGHT);
+    dLayout = createDescriptorLayout(device->device);
+
     // syncObjects = new SyncObjects(MAX_FRAMES_IN_FLIGHT, device->device);
 
     // create a empty scene
@@ -89,6 +90,7 @@ void nge::Nightingale::loadScene(std::string name){
                     object.sy
                 );
                 buffer->texture = object.properties["texture"];
+                buffer->object = &object;
                 buffers.push_back(buffer);
             }
 
@@ -100,18 +102,29 @@ void nge::Nightingale::loadScene(std::string name){
 }
 
 void nge::Nightingale::run(){
+    currentFrame = 1; 
     while(!glfwWindowShouldClose(window->window)){
         glfwPollEvents();
         if(glfwGetKey(window->window, GLFW_KEY_W) == GLFW_PRESS){
         }
         for(auto &buffer: buffers){
-            renderBuffer(window->window, pipelines["default"], buffer, dLayout);
+            renderBuffer(
+                window,
+                device,
+                command,
+                pipelineLayout,
+                pipelines["default"],
+                renderpass, 
+                buffer,
+                dSets[buffer->texture],
+                currentFrame
+            );
         }
         std::this_thread::sleep_for(std::chrono::milliseconds(20));
     }
 }
 
 void nge::Nightingale::createTexture(const char* name, const char* filepath){
-    Texture *t = new Texture(device->device, name, filepath);
-    textures[name] = t;
+    Texture *t = new Texture(device->graphics, device->physical, device->device, name, filepath);
+    dSets[name] = createDescriptorsets(MAX_FRAMES_IN_FLIGHT, device->device, dPool, dLayout, t);
 }

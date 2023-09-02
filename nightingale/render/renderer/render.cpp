@@ -3,50 +3,78 @@
 #include <glm/glm.hpp>
 
 void nge::renderBuffer(
-    VkDevice device,
-
+    Window *window,
+    Device *device, 
+    Command *command,
+    PipelineLayout *pipelineLayout, 
+    Pipeline *pipeline, 
+    VkCommandBuffer cBuffer,  
+    VkRenderPass renderPass,
+    GameObjectBuffer buffer,
+    std::vector<VkDescriptorSet> descriptorSets,
+    int currentFrame
 ){
-    vkWaitForFences(device, 1, &renderer->inFlightFences[renderer->current_frame], VK_TRUE, UINT64_MAX);
+    vkWaitForFences(device->device, 1, &pipeline->syncObjects->inFlightFences[currentFrame], VK_TRUE, UINT64_MAX);
     uint32_t imageIndex;
 
     VkResult result = vkAcquireNextImageKHR(
-        renderer->device.device, 
-        renderer->swap_chain.swapChain, 
+        device->device, 
+        device->swapchain, 
         UINT64_MAX, 
-        renderer->imageAvailableSemaphores[renderer->current_frame], 
+        pipeline->syncObjects->imageAvailableSemaphores[currentFrame], 
         VK_NULL_HANDLE, 
         &imageIndex)
     ;
 
 
     if (result == VK_ERROR_OUT_OF_DATE_KHR) {
-        recreateSwapChain(window, renderer);
-        return NE_FAILURE;
+        SwapChainSupportDetails details = device->querySwapChainSupport();
+        QueueFamilyIndices indices = device->findQueueFamilyIndices();
+        window->reCreateSwapChain(
+            device->physical,
+            device->device,
+            device->surface,
+            details.capabilities,
+            details.formats,
+            details.present_modes,
+            indices.graphicsFamily,
+            indices.presentFamily
+        );
+        return ;
     } else if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR) {
         throw std::runtime_error("failed to acquire swap chain image!");
     }
-    vkResetFences(renderer->device.device, 1, &renderer->inFlightFences[renderer->current_frame]);
-    vkResetCommandBuffer(renderer->command_buffers[renderer->current_frame], /*VkCommandBufferResetFlagBits*/ 0);
-    recordCommandBuffer(renderer, renderer->command_buffers[renderer->current_frame], imageIndex, renderer->pipelines["default"], vertex_buffer, index_buffer, descriptorSets, x);
+    vkResetFences(device->device, 1,  &pipeline->syncObjects->inFlightFences[currentFrame]);
+    vkResetCommandBuffer(command->buffers[currentFrame], /*VkCommandBufferResetFlagBits*/ 0);
+    recordCommandBuffer(
+        device,
+        pipelineLayout,
+        pipeline,
+        command->buffers[imageIndex],
+        renderPass,
+        buffer,
+        descriptorSets[currentFrame],
+        imageIndex
+    );
 
 
     VkSubmitInfo submitInfo{};
     submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
     
-    VkSemaphore waitSemaphores[] = {renderer->imageAvailableSemaphores[renderer->current_frame]};
+    VkSemaphore waitSemaphores[] = {pipeline->syncObjects->imageAvailableSemaphores[currentFrame]};
     VkPipelineStageFlags waitStages[] = {VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
     submitInfo.waitSemaphoreCount = 1;
     submitInfo.pWaitSemaphores = waitSemaphores;
     submitInfo.pWaitDstStageMask = waitStages;
 
     submitInfo.commandBufferCount = 1;
-    submitInfo.pCommandBuffers = &renderer->command_buffers[renderer->current_frame];
+    submitInfo.pCommandBuffers = &command->buffers[currentFrame];
 
-    VkSemaphore signalSemaphores[] = {renderer->renderFinishedSemaphores[renderer->current_frame]};
+    VkSemaphore signalSemaphores[] = {pipeline->syncObjects->renderFinishedSemaphores[currentFrame]};
     submitInfo.signalSemaphoreCount = 1;
     submitInfo.pSignalSemaphores = signalSemaphores;
 
-    if (vkQueueSubmit(renderer->device.graphics_queue, 1, &submitInfo, renderer->inFlightFences[renderer->current_frame]) != VK_SUCCESS) {
+    if (vkQueueSubmit(device->graphics, 1, &submitInfo, pipeline->syncObjects->inFlightFences[currentFrame]) != VK_SUCCESS) {
         throw std::runtime_error("failed to submit draw command buffer!");
     }
 
@@ -56,24 +84,31 @@ void nge::renderBuffer(
     presentInfo.waitSemaphoreCount = 1;
     presentInfo.pWaitSemaphores = signalSemaphores;
 
-    VkSwapchainKHR swapChains[] = {renderer->swap_chain.swapChain};
+    VkSwapchainKHR swapChains[] = {device->swapchain};
     presentInfo.swapchainCount = 1;
     presentInfo.pSwapchains = swapChains;
 
     presentInfo.pImageIndices = &imageIndex;
 
-    result = vkQueuePresentKHR(renderer->device.present_queue, &presentInfo);
-    if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || renderer->framebufferResized) {
-        renderer->framebufferResized = false;
-        recreateSwapChain(window, renderer);
+    result = vkQueuePresentKHR(device->present, &presentInfo);
+    if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || device->framebufferResized) {
+        device->framebufferResized = false;
+        SwapChainSupportDetails details = device->querySwapChainSupport();
+        QueueFamilyIndices indices = device->findQueueFamilyIndices();
+        window->reCreateSwapChain(
+            device->physical,
+            device->device,
+            device->surface,
+            details.capabilities,
+            details.formats,
+            details.present_modes,
+            indices.graphicsFamily,
+            indices.presentFamily
+        );
     } else if (result != VK_SUCCESS) {
         throw std::runtime_error("failed to present swap chain image!");
     }
 
-    renderer->current_frame = (renderer->current_frame + 1) % MAX_FRAMES_IN_FLIGHT;
-    
-
-    return NE_SUCCESS;
 }
 
 void nge::recordCommandBuffer(
@@ -82,9 +117,9 @@ void nge::recordCommandBuffer(
     Pipeline *pipeline, 
     VkCommandBuffer cBuffer,  
     VkRenderPass renderPass,
-    uint32_t imageIndex,
-    GameObjectBuffer buffer
-
+    GameObjectBuffer buffer,
+    VkDescriptorSet descriptorSet,
+    uint32_t imageIndex
 ){
 
     VkCommandBufferBeginInfo beginInfo{};
@@ -128,7 +163,7 @@ void nge::recordCommandBuffer(
     vkCmdBindVertexBuffers(cBuffer, 0, 1, vertexBuffers, offsets);
     
     vkCmdBindIndexBuffer(cBuffer, buffer.indexBuffer, 0, VK_INDEX_TYPE_UINT16);
-    vkCmdBindDescriptorSets(cBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout->layout, 0, 1, &descriptorSets[frameIndex], 0, nullptr);
+    vkCmdBindDescriptorSets(cBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout->layout, 0, 1, &descriptorSet, 0, nullptr);
 
     Vertex2 temp{};
     // temp.pos = glm::vec2(x, 0);

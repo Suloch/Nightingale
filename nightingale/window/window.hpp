@@ -36,11 +36,22 @@ namespace nge{
                 std::optional<uint32_t> graphicsFamily,
                 std::optional<uint32_t> presentFamily
             );
+            VkSwapchainKHR reCreateSwapChain(
+                VkPhysicalDevice physical_device, 
+                VkDevice device, 
+                VkSurfaceKHR surface,
+                VkSurfaceCapabilitiesKHR capabilities,
+                std::vector<VkSurfaceFormatKHR> formats,
+                std::vector<VkPresentModeKHR> present_modes,
+                std::optional<uint32_t> graphicsFamily,
+                std::optional<uint32_t> presentFamily
+            );
 
 
         private:
             VkSurfaceFormatKHR surfaceFormat;
             VkPresentModeKHR presentMode;
+            VkDevice device;
 
             int height;
             int width;

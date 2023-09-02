@@ -3,6 +3,8 @@
 #include <vulkan/vulkan.h>
 #include <glm/glm.hpp>
 
+#include "texture/texture.hpp"
+
 namespace nge{
     struct Vertex2{
         glm::vec2 pos;
@@ -51,4 +53,8 @@ namespace nge{
         private:
             VkShaderModule createShader(VkDevice device, const std::string& filename);  
     };
+
+    std::vector<VkDescriptorSet> createDescriptorsets(int maxFrames, VkDevice device, VkDescriptorPool dPool, VkDescriptorSetLayout dLayout, Texture *t);
+    VkDescriptorPool createDescriptorPool(VkDevice device, int maxFrames);
+    VkDescriptorSetLayout createDescriptorLayout(VkDevice device);
 }

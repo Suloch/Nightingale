@@ -42,12 +42,13 @@ namespace nge{
             VkInstance instance;
             VkCommandPool commandPool;
             VkSwapchainKHR swapchain;
+            VkExtent2D extent;
             std::vector<VkImageView> image_views;
             std::vector<VkFramebuffer> frameBuffers;
             void create();
             bool validationEnabled;
             std::vector<const char*>validationLayers;
-
+            bool framebufferResized = false;
             
             Device(bool validationEnabled, std::vector<const char*>validationLayers);
             ~Device();

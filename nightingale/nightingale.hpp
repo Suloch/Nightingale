@@ -1,10 +1,8 @@
 #pragma once
 
 #include "gameobject/gameobject.hpp"
-#include "texture/texture.hpp"
-#include "render/renderer/pipeline/pipeline.hpp"
-#include "render/renderer/command/command.hpp"
-#include "render/renderer/buffer/buffer.hpp"
+#include "render/renderer/render.hpp"
+
 
 #include<map>
 #include<string>
@@ -37,7 +35,7 @@ namespace nge{
             void loadScene(std::string name);
 
         private:
-            std::map<std::string, Texture *> textures;
+            std::map<std::string, std::vector<VkDescriptorSet>> dSets;
             std::vector<GameObjectBuffer *> buffers;
             std::map<std::string, Pipeline *> pipelines;
             Device *device;
@@ -47,8 +45,8 @@ namespace nge{
             VkRenderPass renderpass;
             SyncObjects *syncObjects;
 
-            VkDescriptorPool *dPool;
-            VkDescriptorSetLayout *dLayout;
+            VkDescriptorPool dPool;
+            VkDescriptorSetLayout dLayout;
 
             int currentFrame = 0;
             const char *name;
