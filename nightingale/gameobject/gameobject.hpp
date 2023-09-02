@@ -8,8 +8,8 @@ namespace nge{
         public:
             float x; //x-position
             float y; //y-position
-            float sx; //x-scale
-            float sy; //y-scale
+            float sx = 1.0f; //x-scale
+            float sy = 1.0f; //y-scale
             float r; //rotation in radians
             std::map<std::string, std::string> properties;
 

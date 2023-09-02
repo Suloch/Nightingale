@@ -81,7 +81,7 @@ void nge::Nightingale::loadScene(std::string name){
                     device->physical,
                     device->device,
                     device->graphics,
-                    device->commandPool,
+                    command->pool,
                     object.x,
                     object.y,
                     object.sx,
@@ -106,6 +106,7 @@ void nge::Nightingale::run(){
         if(glfwGetKey(window->window, GLFW_KEY_W) == GLFW_PRESS){
         }
         for(auto &buffer: buffers){
+            Logger::getInstance().log("rendering buffer");
             renderBuffer(
                 window,
                 device,
@@ -117,8 +118,10 @@ void nge::Nightingale::run(){
                 dSets[buffer->texture],
                 currentFrame
             );
+            Logger::getInstance().log("rendered buffer");
         }
         std::this_thread::sleep_for(std::chrono::milliseconds(20));
+        currentFrame = (currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
     }
 }
 

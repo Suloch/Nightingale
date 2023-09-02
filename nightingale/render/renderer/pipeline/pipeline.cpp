@@ -173,6 +173,7 @@ nge::Pipeline::Pipeline(char *name, VkDevice device, VkPipelineLayout pipelineLa
 
     vkDestroyShaderModule(device, fragShaderModule, nullptr);
     vkDestroyShaderModule(device, vertShaderModule, nullptr);
+    syncObjects = new SyncObjects(2, device);
 }
 
 VkShaderModule nge::Pipeline::createShader(VkDevice device, const std::string& filename){

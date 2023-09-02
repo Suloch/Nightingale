@@ -1,12 +1,12 @@
 
 
 # include "../nightingale/nightingale.hpp"
+#include "nightingale/logger/logger.hpp"
 
 #include<iostream>
 #include <vector>
 
 int main(){
-    
     // create the instance which create a default scene
     nge::Nightingale app =  nge::Nightingale(600, 800, "Test");
 
@@ -49,7 +49,8 @@ int main(){
         // add rigid body property
         
 
-
+    // load the scene
+    app.loadScene("default");
 
     // run the application
     app.run();

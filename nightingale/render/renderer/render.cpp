@@ -1,6 +1,7 @@
 #include "render.hpp"
 #include <stdexcept>
 #include <glm/glm.hpp>
+#include "../../logger/logger.hpp"
 
 void nge::renderBuffer(
     Window *window,
@@ -13,9 +14,13 @@ void nge::renderBuffer(
     std::vector<VkDescriptorSet> descriptorSets,
     int currentFrame
 ){
+    Logger::getInstance().log("Waiting for fences")    ;
+
     vkWaitForFences(device->device, 1, &pipeline->syncObjects->inFlightFences[currentFrame], VK_TRUE, UINT64_MAX);
     uint32_t imageIndex;
+    Logger::getInstance().log("Waited fences")    ;
 
+    Logger::getInstance().log("Getting next swap chain image")    ;
     VkResult result = vkAcquireNextImageKHR(
         device->device, 
         device->swapchain, 
@@ -25,6 +30,7 @@ void nge::renderBuffer(
         &imageIndex)
     ;
 
+    Logger::getInstance().log("Got next swap chain image")    ;
 
     if (result == VK_ERROR_OUT_OF_DATE_KHR) {
         reCreateSwapChain(window, device, renderPass);
@@ -34,6 +40,8 @@ void nge::renderBuffer(
     }
     vkResetFences(device->device, 1,  &pipeline->syncObjects->inFlightFences[currentFrame]);
     vkResetCommandBuffer(command->buffers[currentFrame], /*VkCommandBufferResetFlagBits*/ 0);
+
+    Logger::getInstance().log("Recording command")    ;
     recordCommandBuffer(
         device,
         pipelineLayout,
@@ -45,6 +53,7 @@ void nge::renderBuffer(
         imageIndex
     );
 
+    Logger::getInstance().log("Recorded command")    ;
 
     VkSubmitInfo submitInfo{};
     submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
@@ -61,6 +70,8 @@ void nge::renderBuffer(
     VkSemaphore signalSemaphores[] = {pipeline->syncObjects->renderFinishedSemaphores[currentFrame]};
     submitInfo.signalSemaphoreCount = 1;
     submitInfo.pSignalSemaphores = signalSemaphores;
+
+    Logger::getInstance().log("Submitting ")    ;
 
     if (vkQueueSubmit(device->graphics, 1, &submitInfo, pipeline->syncObjects->inFlightFences[currentFrame]) != VK_SUCCESS) {
         throw std::runtime_error("failed to submit draw command buffer!");

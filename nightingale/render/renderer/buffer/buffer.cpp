@@ -2,13 +2,15 @@
 #include "buffer.hpp"
 
 #include "../utils.hpp"
+#include "../../../logger/logger.hpp"
 
 #include<cstring>
 
 nge::GameObjectBuffer::GameObjectBuffer(VkPhysicalDevice pDevice, VkDevice device, VkQueue graphics, VkCommandPool pool, float x, float y,  float sx, float sy){
     x = x - sx / 2 ;
     y = y - sy / 2;
-
+    Logger::getInstance().log("x: ", x);
+    Logger::getInstance().log(y);
     const std::vector<Vertex> vertices = {
         {{-x, -y}, {0.0f, 0.0f, 1.0f}, {1.0f, 0.0f}},
         {{x, -y}, {0.0f, 0.0f, 1.0f}, {0.0f, 0.0f}},
