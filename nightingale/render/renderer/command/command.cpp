@@ -38,6 +38,6 @@ void nge::Command::createCommandPool(std::optional<uint32_t> graphicsFamily){
 
 
 nge::Command::~Command(){
-
+    vkDestroyCommandPool(device, pool, nullptr);
 }
 

@@ -35,5 +35,4 @@ namespace nge{
         VkRenderPass renderPass
     );
 
-    void cleanSwapChain(Window *window, Device *device);
 }

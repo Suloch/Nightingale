@@ -35,6 +35,7 @@ namespace nge{
             void loadScene(std::string name);
         private:
             std::map<std::string, std::vector<VkDescriptorSet>> dSets;
+            std::vector<Texture *> textures;
             std::vector<GameObjectBuffer *> buffers;
             std::map<std::string, Pipeline *> pipelines;
             Device *device;
@@ -42,7 +43,6 @@ namespace nge{
             PipelineLayout *pipelineLayout;
             Command *command;
             VkRenderPass renderpass;
-            SyncObjects *syncObjects;
 
             VkDescriptorPool dPool;
             VkDescriptorSetLayout dLayout;

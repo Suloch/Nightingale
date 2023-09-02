@@ -37,6 +37,7 @@ nge::Nightingale::Nightingale(int height, int width, const char* name){
     );
 
     device->image_views = window->createImageViews(device->device);
+    device->extent = window->extent;
 
     renderpass = createRenderPass(
         device->device,
@@ -68,7 +69,37 @@ nge::Nightingale::Nightingale(int height, int width, const char* name){
 }
 
 nge::Nightingale::~Nightingale(){
+    vkDeviceWaitIdle(device->device);
+    for(auto &texture: textures){
+        delete texture;
+    }
+    // for(auto dset: dSets){
+    //     for(auto &d: dset.second){
+    //         vkDestroyDescriptorSet
+    //     }
+    // }
     
+    vkDestroyDescriptorPool(device->device, dPool, nullptr);
+    vkDestroyDescriptorSetLayout(device->device, dLayout, nullptr);
+
+    for(auto buffer: buffers){
+        delete buffer;
+    }
+
+    for(auto pipeline: pipelines){
+        delete pipeline.second;
+    }
+
+    delete pipelineLayout;
+
+    vkDestroyRenderPass(device->device, renderpass, nullptr);
+    
+    delete command;
+    
+    delete window;
+    
+    delete device;
+
 }
 
 void nge::Nightingale::loadScene(std::string name){
@@ -106,7 +137,6 @@ void nge::Nightingale::run(){
         if(glfwGetKey(window->window, GLFW_KEY_W) == GLFW_PRESS){
         }
         for(auto &buffer: buffers){
-            Logger::getInstance().log("rendering buffer");
             renderBuffer(
                 window,
                 device,
@@ -118,7 +148,6 @@ void nge::Nightingale::run(){
                 dSets[buffer->texture],
                 currentFrame
             );
-            Logger::getInstance().log("rendered buffer");
         }
         std::this_thread::sleep_for(std::chrono::milliseconds(20));
         currentFrame = (currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
@@ -127,6 +156,7 @@ void nge::Nightingale::run(){
 
 void nge::Nightingale::createTexture(const char* name, const char* filepath){
     Texture *t = new Texture(command->pool, device->graphics, device->physical, device->device, name, filepath);
+    textures.push_back(t);
     dSets[name] = createDescriptorsets(MAX_FRAMES_IN_FLIGHT, device->device, dPool, dLayout, t);
 }
 

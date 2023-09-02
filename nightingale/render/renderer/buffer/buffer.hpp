@@ -59,6 +59,7 @@ namespace nge{
             ~GameObjectBuffer();
         
         private:
+            VkDevice device;
             void createVertexBuffer(VkPhysicalDevice pDevice, VkDevice device, VkQueue graphics, VkCommandPool pool, const std::vector<Vertex> vertices);
             void createIndexBuffer(VkPhysicalDevice pDevice, VkDevice device, VkQueue graphics, VkCommandPool pool, const std::vector<uint16_t> indices);
     };

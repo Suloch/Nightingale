@@ -11,7 +11,11 @@ nge::GameObject::GameObject(){
 }
 
 nge::GameObject::GameObject(char *name){
-    GameObject();
+    x = 0;
+    y = 0;
+    sx = 1;
+    sy = 1;
+    r = 0;
     this->name = name;
 }
 

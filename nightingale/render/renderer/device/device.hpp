@@ -32,7 +32,11 @@ namespace nge{
             bool checkExtensionSupport(VkPhysicalDevice device);
             void createInstance();
             bool checkValidationLayerSupport();
+            VkDebugUtilsMessengerEXT debugMessenger;
             void populateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT& createInfo);
+            void createDebugMessenger();
+            VkResult CreateDebugUtilsMessengerEXT(const VkDebugUtilsMessengerCreateInfoEXT* pCreateInfo, const VkAllocationCallbacks* pAllocator);
+            void DestroyDebugUtilsMessengerEXT(const VkAllocationCallbacks* pAllocator);
         public:
             std::vector<const char*> requiredExtensions;
             VkPhysicalDevice physical;
@@ -61,5 +65,6 @@ namespace nge{
                 VkDebugUtilsMessageTypeFlagsEXT messageType,
                 const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData,
                 void* pUserData);
+            void cleanSwapChain();
     };
 }

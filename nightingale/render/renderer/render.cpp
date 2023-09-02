@@ -14,13 +14,10 @@ void nge::renderBuffer(
     std::vector<VkDescriptorSet> descriptorSets,
     int currentFrame
 ){
-    Logger::getInstance().log("Waiting for fences")    ;
 
     vkWaitForFences(device->device, 1, &pipeline->syncObjects->inFlightFences[currentFrame], VK_TRUE, UINT64_MAX);
     uint32_t imageIndex;
-    Logger::getInstance().log("Waited fences")    ;
 
-    Logger::getInstance().log("Getting next swap chain image")    ;
     VkResult result = vkAcquireNextImageKHR(
         device->device, 
         device->swapchain, 
@@ -30,7 +27,6 @@ void nge::renderBuffer(
         &imageIndex)
     ;
 
-    Logger::getInstance().log("Got next swap chain image")    ;
 
     if (result == VK_ERROR_OUT_OF_DATE_KHR) {
         reCreateSwapChain(window, device, renderPass);
@@ -41,19 +37,17 @@ void nge::renderBuffer(
     vkResetFences(device->device, 1,  &pipeline->syncObjects->inFlightFences[currentFrame]);
     vkResetCommandBuffer(command->buffers[currentFrame], /*VkCommandBufferResetFlagBits*/ 0);
 
-    Logger::getInstance().log("Recording command")    ;
     recordCommandBuffer(
         device,
         pipelineLayout,
         pipeline,
-        command->buffers[imageIndex],
+        command->buffers[currentFrame],
         renderPass,
         buffer,
         descriptorSets[currentFrame],
         imageIndex
     );
 
-    Logger::getInstance().log("Recorded command")    ;
 
     VkSubmitInfo submitInfo{};
     submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
@@ -71,12 +65,10 @@ void nge::renderBuffer(
     submitInfo.signalSemaphoreCount = 1;
     submitInfo.pSignalSemaphores = signalSemaphores;
 
-    Logger::getInstance().log("Submitting ")    ;
 
     if (vkQueueSubmit(device->graphics, 1, &submitInfo, pipeline->syncObjects->inFlightFences[currentFrame]) != VK_SUCCESS) {
         throw std::runtime_error("failed to submit draw command buffer!");
     }
-
     VkPresentInfoKHR presentInfo{};
     presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
 
@@ -132,6 +124,7 @@ void nge::recordCommandBuffer(
 
     vkCmdBeginRenderPass(cBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
     vkCmdBindPipeline(cBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline->pipeline);
+
     VkViewport viewport{};
     viewport.x = 0.0f;
     viewport.y = 0.0f;
@@ -176,7 +169,7 @@ void nge::reCreateSwapChain(Window *window, Device *device, VkRenderPass renderP
 
     vkDeviceWaitIdle(device->device);
 
-    cleanSwapChain(window, device);
+    device->cleanSwapChain();
     SwapChainSupportDetails details = device->querySwapChainSupport(device->physical);
     QueueFamilyIndices indices = device->findQueueFamilyIndices(device->physical);
     device->swapchain = window->createSwapChain(
@@ -192,16 +185,4 @@ void nge::reCreateSwapChain(Window *window, Device *device, VkRenderPass renderP
     device->image_views = window->createImageViews(device->device);
     device->frameBuffers = window->createFrameBuffers(device->device, device->image_views, renderPass);
 
-}
-
-
-void nge::cleanSwapChain(Window *window, Device *device){
-    for (auto framebuffer : device->frameBuffers) {
-        vkDestroyFramebuffer(device->device, framebuffer, nullptr);
-    }
-    for (auto imageView : device->image_views) {
-        vkDestroyImageView(device->device, imageView, nullptr);
-    }
-
-    vkDestroySwapchainKHR(device->device, device->swapchain, nullptr);
 }

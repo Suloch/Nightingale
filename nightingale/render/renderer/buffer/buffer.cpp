@@ -7,15 +7,15 @@
 #include<cstring>
 
 nge::GameObjectBuffer::GameObjectBuffer(VkPhysicalDevice pDevice, VkDevice device, VkQueue graphics, VkCommandPool pool, float x, float y,  float sx, float sy){
+    this->device = device;
     x = x - sx / 2 ;
     y = y - sy / 2;
-    Logger::getInstance().log("x: ", x);
-    Logger::getInstance().log(y);
+
     const std::vector<Vertex> vertices = {
-        {{-x, -y}, {0.0f, 0.0f, 1.0f}, {1.0f, 0.0f}},
-        {{x, -y}, {0.0f, 0.0f, 1.0f}, {0.0f, 0.0f}},
-        {{x, y}, {0.0f, 0.0f, 1.0f}, {0.0f, 1.0f}},
-        {{-x, y}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}}
+        {{x, y}, {0.0f, 0.0f, 1.0f}, {1.0f, 0.0f}},
+        {{-x, y}, {0.0f, 0.0f, 1.0f}, {0.0f, 0.0f}},
+        {{-x, -y}, {0.0f, 0.0f, 1.0f}, {0.0f, 1.0f}},
+        {{x, -y}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}}
     };
 
     const std::vector<uint16_t> indices = {
@@ -101,5 +101,8 @@ void nge::GameObjectBuffer::createIndexBuffer(VkPhysicalDevice pDevice, VkDevice
 }
 
 nge::GameObjectBuffer::~GameObjectBuffer(){
-    
+    vkDestroyBuffer(device, indexBuffer, nullptr);
+    vkDestroyBuffer(device, vertexBuffer, nullptr);
+    vkFreeMemory(device, indexMemory, nullptr);
+    vkFreeMemory(device, vertexMemory, nullptr);
 }

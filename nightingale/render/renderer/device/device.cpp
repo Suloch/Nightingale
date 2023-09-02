@@ -13,6 +13,36 @@ nge::Device::Device(bool validationEnabled, std::vector<const char*>validationLa
     this->validationLayers = validationLayers;
     this->requiredExtensions = requiredExtensions;
     createInstance();
+    if(validationEnabled){
+        createDebugMessenger();
+    }
+}
+
+
+void nge::Device::createDebugMessenger(){
+    VkDebugUtilsMessengerCreateInfoEXT createInfo;
+    populateDebugMessengerCreateInfo(createInfo);
+
+    if (CreateDebugUtilsMessengerEXT(&createInfo, nullptr) != VK_SUCCESS) {
+        throw std::runtime_error("failed to set up debug messenger!");
+    }
+}
+
+VkResult nge::Device::CreateDebugUtilsMessengerEXT(const VkDebugUtilsMessengerCreateInfoEXT* pCreateInfo, const VkAllocationCallbacks* pAllocator) {
+    auto func = (PFN_vkCreateDebugUtilsMessengerEXT) vkGetInstanceProcAddr(instance, "vkCreateDebugUtilsMessengerEXT");
+    if (func != nullptr) {
+        return func(instance, pCreateInfo, pAllocator, &debugMessenger);
+    } else {
+        return VK_ERROR_EXTENSION_NOT_PRESENT;
+    }
+}
+
+
+void nge::Device::DestroyDebugUtilsMessengerEXT(const VkAllocationCallbacks* pAllocator) {
+    auto func = (PFN_vkDestroyDebugUtilsMessengerEXT) vkGetInstanceProcAddr(instance, "vkDestroyDebugUtilsMessengerEXT");
+    if (func != nullptr) {
+        func(instance, debugMessenger, pAllocator);
+    }
 }
 
 void nge::Device::create(){
@@ -103,9 +133,25 @@ void nge::Device::createInstance(){
     }
 }
 
-nge::Device::~Device(){
+void nge::Device::cleanSwapChain(){
+    for (auto framebuffer : frameBuffers) {
+        vkDestroyFramebuffer(device, framebuffer, nullptr);
+    }
+    for (auto imageView : image_views) {
+        vkDestroyImageView(device, imageView, nullptr);
+    }
 
+    vkDestroySwapchainKHR(device, swapchain, nullptr);
+}
+
+nge::Device::~Device(){
+    cleanSwapChain();
+    if(validationEnabled){
+        DestroyDebugUtilsMessengerEXT(nullptr);
+    }
     vkDestroyDevice(device, nullptr);
+    vkDestroySurfaceKHR(instance, surface, nullptr);
+    vkDestroyInstance(instance, nullptr);
 
 }
 

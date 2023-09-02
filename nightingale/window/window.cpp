@@ -200,3 +200,8 @@ std::vector<VkFramebuffer> nge::Window::createFrameBuffers(VkDevice device, std:
 }
 
 
+nge::Window::~Window(){
+    
+    glfwDestroyWindow(window);
+    glfwTerminate();
+}

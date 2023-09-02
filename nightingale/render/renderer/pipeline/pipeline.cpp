@@ -1,6 +1,7 @@
 
 #include "pipeline.hpp"
 #include "../buffer/buffer.hpp"
+#include "../../../logger/logger.hpp"
 
 #include<stdexcept>
 #include<array>
@@ -53,12 +54,13 @@ nge::PipelineLayout::PipelineLayout(VkDevice device){
 
 
 nge::PipelineLayout::~PipelineLayout(){
-    
+    vkDestroyPipelineLayout(device, layout, nullptr);
+    vkDestroyDescriptorSetLayout(device, dSet, nullptr);
 }
 
 
 nge::Pipeline::Pipeline(char *name, VkDevice device, VkPipelineLayout pipelineLayout, VkRenderPass renderPass, char *fragPath, char *vertPath){
-    VkPipeline pipeline;
+    this->device = device;
     VkShaderModule fragShaderModule;
     VkShaderModule vertShaderModule;
 
@@ -205,6 +207,7 @@ VkShaderModule nge::Pipeline::createShader(VkDevice device, const std::string& f
 
 
 nge::SyncObjects::SyncObjects(int frames, VkDevice device){
+    this->device = device;
     imageAvailableSemaphores.resize(frames);
     renderFinishedSemaphores.resize(frames);
     inFlightFences.resize(frames);
@@ -232,9 +235,11 @@ nge::Pipeline::~Pipeline(){
 }
 
 nge::SyncObjects::~SyncObjects(){
+
     for(auto &fence : inFlightFences){
         vkDestroyFence(device, fence, nullptr);
     }
+
     for(auto &semaphore : renderFinishedSemaphores){
         vkDestroySemaphore(device, semaphore, nullptr);
     }
