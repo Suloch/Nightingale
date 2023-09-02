@@ -28,7 +28,7 @@ namespace nge{
         public:
             VkImageView view;
             VkSampler sampler;
-            Texture(VkQueue graphics, VkPhysicalDevice pDevice, VkDevice device, const char* name, const char* filepath);
+            Texture(VkCommandPool commandPool, VkQueue graphics, VkPhysicalDevice pDevice, VkDevice device, const char* name, const char* filepath);
             ~Texture();
     };
 }

@@ -5,13 +5,17 @@
 #include <stb_image.h>
 #include <stdexcept>
 
-nge::Texture::Texture(VkQueue graphics, VkPhysicalDevice pDevice, VkDevice device, const char* name, const char* filepath):device(device){
+nge::Texture::Texture(VkCommandPool commandPool, VkQueue graphics, VkPhysicalDevice pDevice, VkDevice device, const char* name, const char* filepath):device(device){
     this->graphics=graphics;
     this->pDevice = pDevice;
     this->device = device;
     this->commandPool = commandPool;
     this->name = name;
     this->path = filepath;
+    this->commandPool = commandPool;
+    createTextureImage();
+    createTextureImageView(VK_FORMAT_R8G8B8A8_SRGB);
+    createSampler();
 }
 
 nge::Texture::~Texture(){

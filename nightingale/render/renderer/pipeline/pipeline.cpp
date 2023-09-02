@@ -28,24 +28,23 @@ void nge::PipelineLayout::createDescriptorSetLayout(VkDevice device){
 
 
 void nge::PipelineLayout::createPushConstantRange(){
-    VkPushConstantRange range = {};
-    range.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
-    range.offset = 0;
-    range.size = sizeof(Vertex2);
+    pcRange.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
+    pcRange.offset = 0;
+    pcRange.size = sizeof(Vertex2);
 }
 
 nge::PipelineLayout::PipelineLayout(VkDevice device){
     this->device = device;
     createDescriptorSetLayout(device);
     createPushConstantRange();
-    VkPushConstantRange range = pcRange;
 
     VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
     pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
     pipelineLayoutInfo.setLayoutCount = 1;
     pipelineLayoutInfo.pSetLayouts = &dSet;
+    // pipelineLayoutInfo.setLayoutCount = 0;
     pipelineLayoutInfo.pushConstantRangeCount = 1;
-    pipelineLayoutInfo.pPushConstantRanges = &range;
+    pipelineLayoutInfo.pPushConstantRanges = &pcRange;
 
     if (vkCreatePipelineLayout(device, &pipelineLayoutInfo, nullptr, &layout) != VK_SUCCESS) {
         throw std::runtime_error("failed to create pipeline layout!");
@@ -66,26 +65,26 @@ nge::Pipeline::Pipeline(char *name, VkDevice device, VkPipelineLayout pipelineLa
     if(fragPath != nullptr){
         fragShaderModule = createShader(device, fragPath);
     }else{
-        fragShaderModule = createShader(device, "build/nightingale/render/shader/default/frag.spv");
+        fragShaderModule = createShader(device, "build/nightingale/shader/frag.spv");
     }
     if(vertPath != nullptr){
 
         vertShaderModule = createShader(device, vertPath);
     }else{
-        vertShaderModule = createShader(device, "build/nightingale/render/shader/default/vert.spv");
+        vertShaderModule = createShader(device, "build/nightingale/shader/vert.spv");
     }
 
     VkPipelineShaderStageCreateInfo vertShaderStageInfo{};
     vertShaderStageInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
     vertShaderStageInfo.stage = VK_SHADER_STAGE_VERTEX_BIT;
     vertShaderStageInfo.module = vertShaderModule;
-    vertShaderStageInfo.pName = name;
+    vertShaderStageInfo.pName = "main";
 
     VkPipelineShaderStageCreateInfo fragShaderStageInfo{};
     fragShaderStageInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
     fragShaderStageInfo.stage = VK_SHADER_STAGE_FRAGMENT_BIT;
     fragShaderStageInfo.module = fragShaderModule;
-    fragShaderStageInfo.pName = name;
+    fragShaderStageInfo.pName = "main";
 
     VkPipelineShaderStageCreateInfo shaderStages[] = {vertShaderStageInfo, fragShaderStageInfo};
 

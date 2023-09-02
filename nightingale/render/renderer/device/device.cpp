@@ -13,10 +13,6 @@ nge::Device::Device(bool validationEnabled, std::vector<const char*>validationLa
     this->validationLayers = validationLayers;
     this->requiredExtensions = requiredExtensions;
     createInstance();
-        
-    
-
-    Logger::getInstance().log("Device created!");
 }
 
 void nge::Device::create(){
@@ -86,7 +82,6 @@ void nge::Device::createInstance(){
     createInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
     createInfo.pApplicationInfo = &appInfo;
 
-    
     createInfo.enabledExtensionCount = static_cast<uint32_t>(requiredExtensions.size());
     createInfo.ppEnabledExtensionNames = requiredExtensions.data();
 
@@ -112,12 +107,11 @@ nge::Device::~Device(){
 
     vkDestroyDevice(device, nullptr);
 
-    Logger::getInstance().log("Device destroyed!");
 }
 
 void nge::Device::createLogicalDevice(){
 
-    QueueFamilyIndices indices = findQueueFamilyIndices();
+    QueueFamilyIndices indices = findQueueFamilyIndices(physical);
 
 
     std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
@@ -163,6 +157,7 @@ void nge::Device::createLogicalDevice(){
 }
 void nge::Device::pickPhysicalDevice(){
     uint32_t device_count = 0;
+    
     vkEnumeratePhysicalDevices(instance, &device_count, nullptr);
 
     if(device_count == 0){
@@ -172,9 +167,8 @@ void nge::Device::pickPhysicalDevice(){
     std::vector<VkPhysicalDevice> devices(device_count);
 
     vkEnumeratePhysicalDevices(instance, &device_count, devices.data());
-
     for(const auto& device: devices){
-        if(isDeviceSuitable()){
+        if(isDeviceSuitable(device)){
             physical = device;
             break;
         }
@@ -186,12 +180,12 @@ void nge::Device::pickPhysicalDevice(){
 }
 
 
-bool nge::Device::checkExtensionSupport(){
+bool nge::Device::checkExtensionSupport(VkPhysicalDevice device){
     uint32_t extensionCount;
-    vkEnumerateDeviceExtensionProperties(physical, nullptr, &extensionCount, nullptr);
+    vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionCount, nullptr);
 
     std::vector<VkExtensionProperties> availableExtensions(extensionCount);
-    vkEnumerateDeviceExtensionProperties(physical, nullptr, &extensionCount, availableExtensions.data());
+    vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionCount, availableExtensions.data());
 
     std::set<std::string> requiredExtensions(deviceExtensions.begin(), deviceExtensions.end());
 
@@ -202,32 +196,32 @@ bool nge::Device::checkExtensionSupport(){
     return requiredExtensions.empty();
 }
 
-bool nge::Device::isDeviceSuitable(){
-    QueueFamilyIndices indices = findQueueFamilyIndices();
+bool nge::Device::isDeviceSuitable(VkPhysicalDevice device){
+    QueueFamilyIndices indices = findQueueFamilyIndices(device);
 
-    bool extensions_supported = checkExtensionSupport();
-
+    bool extensions_supported = checkExtensionSupport(device);
+    
     bool swap_chain_adequate = false;
 
     if(extensions_supported){
-        SwapChainSupportDetails swap_chain_support = querySwapChainSupport();
+        SwapChainSupportDetails swap_chain_support = querySwapChainSupport(device);
         swap_chain_adequate = !swap_chain_support.formats.empty() && !swap_chain_support.present_modes.empty();
     }
 
     VkPhysicalDeviceFeatures supported_features;
-    vkGetPhysicalDeviceFeatures(physical, &supported_features);
+    vkGetPhysicalDeviceFeatures(device, &supported_features);
 
     return indices.is_complete() && extensions_supported && swap_chain_adequate && supported_features.samplerAnisotropy;
 }
 
-nge::QueueFamilyIndices nge::Device::findQueueFamilyIndices(){
+nge::QueueFamilyIndices nge::Device::findQueueFamilyIndices(VkPhysicalDevice device){
     QueueFamilyIndices indices;
 
     uint32_t queueFamilyCount = 0;
-    vkGetPhysicalDeviceQueueFamilyProperties(physical, &queueFamilyCount, nullptr);
+    vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, nullptr);
 
     std::vector<VkQueueFamilyProperties> queueFamilies(queueFamilyCount);
-    vkGetPhysicalDeviceQueueFamilyProperties(physical, &queueFamilyCount, queueFamilies.data());
+    vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, queueFamilies.data());
 
     int i = 0;
     for (const auto& queueFamily : queueFamilies) {
@@ -236,7 +230,7 @@ nge::QueueFamilyIndices nge::Device::findQueueFamilyIndices(){
         }
 
         VkBool32 presentSupport = false;
-        vkGetPhysicalDeviceSurfaceSupportKHR(physical, i, surface, &presentSupport);
+        vkGetPhysicalDeviceSurfaceSupportKHR(device, i, surface, &presentSupport);
 
         if (presentSupport) {
             indices.presentFamily = i;
@@ -252,24 +246,24 @@ nge::QueueFamilyIndices nge::Device::findQueueFamilyIndices(){
     return indices;
 }
 
-nge::SwapChainSupportDetails nge::Device::querySwapChainSupport(){
+nge::SwapChainSupportDetails nge::Device::querySwapChainSupport(VkPhysicalDevice device){
     SwapChainSupportDetails details;
-    vkGetPhysicalDeviceSurfaceCapabilitiesKHR(physical, surface, &details.capabilities);
+    vkGetPhysicalDeviceSurfaceCapabilitiesKHR(device, surface, &details.capabilities);
 
     uint32_t formatCount;
-    vkGetPhysicalDeviceSurfaceFormatsKHR(physical, surface, &formatCount, nullptr);
+    vkGetPhysicalDeviceSurfaceFormatsKHR(device, surface, &formatCount, nullptr);
 
     if (formatCount != 0) {
         details.formats.resize(formatCount);
-        vkGetPhysicalDeviceSurfaceFormatsKHR(physical, surface, &formatCount, details.formats.data());
+        vkGetPhysicalDeviceSurfaceFormatsKHR(device, surface, &formatCount, details.formats.data());
     }
 
     uint32_t presentModeCount;
-    vkGetPhysicalDeviceSurfacePresentModesKHR(physical, surface, &presentModeCount, nullptr);
+    vkGetPhysicalDeviceSurfacePresentModesKHR(device, surface, &presentModeCount, nullptr);
 
     if (presentModeCount != 0) {
         details.present_modes.resize(presentModeCount);
-        vkGetPhysicalDeviceSurfacePresentModesKHR(physical, surface, &presentModeCount, details.present_modes.data());
+        vkGetPhysicalDeviceSurfacePresentModesKHR(device, surface, &presentModeCount, details.present_modes.data());
     }
 
     return details;

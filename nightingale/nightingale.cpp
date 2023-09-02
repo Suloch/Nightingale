@@ -9,19 +9,21 @@
 
 nge::Nightingale::Nightingale(int height, int width, const char* name){
     // init logger
-    nge::Logger::getInstance().start(nge::debug, "log.txt");
+    Logger::getInstance().start(nge::debug, "log.txt");
 
-    std::vector<const char*>validationLayers;
+    const std::vector<const char*> validationLayers = {
+        "VK_LAYER_KHRONOS_validation"
+    };
+    window = new Window(name, height, width);
 
     device = new Device(true, validationLayers, getRequiredExtensions(true));
-    window = new Window(name, height, width);
 
     device->surface = window->createSurface(device->instance);
 
     device->create();
 
-    SwapChainSupportDetails details = device->querySwapChainSupport();
-    QueueFamilyIndices indices = device->findQueueFamilyIndices();
+    SwapChainSupportDetails details = device->querySwapChainSupport(device->physical);
+    QueueFamilyIndices indices = device->findQueueFamilyIndices(device->physical);
 
     device->swapchain = window->createSwapChain(
         device->physical,
@@ -42,7 +44,7 @@ nge::Nightingale::Nightingale(int height, int width, const char* name){
     );
     device->frameBuffers = window->createFrameBuffers(device->device, device->image_views, renderpass);
 
-    pipelineLayout = new PipelineLayout();
+    pipelineLayout = new PipelineLayout(device->device);
 
     command = new Command(device->device, indices.graphicsFamily);
 
@@ -121,7 +123,7 @@ void nge::Nightingale::run(){
 }
 
 void nge::Nightingale::createTexture(const char* name, const char* filepath){
-    Texture *t = new Texture(device->graphics, device->physical, device->device, name, filepath);
+    Texture *t = new Texture(command->pool, device->graphics, device->physical, device->device, name, filepath);
     dSets[name] = createDescriptorsets(MAX_FRAMES_IN_FLIGHT, device->device, dPool, dLayout, t);
 }
 

@@ -166,8 +166,8 @@ void nge::reCreateSwapChain(Window *window, Device *device, VkRenderPass renderP
     vkDeviceWaitIdle(device->device);
 
     cleanSwapChain(window, device);
-    SwapChainSupportDetails details = device->querySwapChainSupport();
-    QueueFamilyIndices indices = device->findQueueFamilyIndices();
+    SwapChainSupportDetails details = device->querySwapChainSupport(device->physical);
+    QueueFamilyIndices indices = device->findQueueFamilyIndices(device->physical);
     device->swapchain = window->createSwapChain(
         device->physical,
         device->device,

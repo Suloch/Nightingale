@@ -28,8 +28,8 @@ namespace nge{
 
             void pickPhysicalDevice();
             void createLogicalDevice();
-            bool isDeviceSuitable();
-            bool checkExtensionSupport();
+            bool isDeviceSuitable(VkPhysicalDevice device);
+            bool checkExtensionSupport(VkPhysicalDevice device);
             void createInstance();
             bool checkValidationLayerSupport();
             void populateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT& createInfo);
@@ -54,8 +54,8 @@ namespace nge{
             Device(bool validationEnabled, std::vector<const char*>validationLayers, std::vector<const char*> requiredExtensions);
             ~Device();
 
-            QueueFamilyIndices findQueueFamilyIndices();
-            SwapChainSupportDetails querySwapChainSupport();
+            QueueFamilyIndices findQueueFamilyIndices(VkPhysicalDevice device);
+            SwapChainSupportDetails querySwapChainSupport(VkPhysicalDevice device);
             static  VkBool32 VKAPI_CALL debugCallback(
                 VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
                 VkDebugUtilsMessageTypeFlagsEXT messageType,

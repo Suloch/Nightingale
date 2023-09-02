@@ -15,14 +15,13 @@ namespace nge{
         
         private:
             VkDescriptorSetLayout dSet;
-            VkPushConstantRange pcRange;
+            VkPushConstantRange pcRange={};
             VkDevice device;
             void createDescriptorSetLayout(VkDevice device);
             void createPushConstantRange();
 
         public:
             VkPipelineLayout layout;
-            PipelineLayout(){};
             PipelineLayout(VkDevice device);
             ~PipelineLayout();
     };

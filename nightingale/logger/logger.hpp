@@ -16,6 +16,7 @@ namespace nge{
                 return logger;
             }
         private:
+            int line = 0;
             bool started;
             LogLevel level;
             bool cerr;

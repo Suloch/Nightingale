@@ -14,22 +14,33 @@ void nge::Logger::start(LogLevel level, const char* filename){
     this->level = level;
 }
 
+// template<typename T>
+// void nge::Logger::log(const T &msg){
+//     if(cerr){
+//         std::cerr<<line<<": "<<level<<": "<<msg<<std::endl;
+//     }else{
+//         file<<line<<": "<<level<<": "<<msg<<std::endl;
+//     }
+// }
+
 void nge::Logger::log(const char* log ){
     if(cerr){
-        std::cerr<<level<<": "<<log<<std::endl;
+        std::cerr<<line<<": "<<level<<": "<<log<<std::endl;
     }else{
-        file<<level<<": "<<log<<std::endl;
+        file<<line<<": "<<level<<": "<<log<<std::endl;
     }
+    line++;
 }
 
 void nge::Logger::log(const char* log, LogLevel level ){
     if(level >= this->level){
         if(cerr){
-            std::cerr<<level<<": "<<log<<std::endl;
+            std::cerr<<line<<": "<<level<<": "<<log<<std::endl;
         }else{
-            file<<level<<": "<<log<<std::endl;
+            file<<line<<": "<<level<<": "<<log<<std::endl;
         }
     }
+    line++;
 }
 
 void nge::Logger::stop(){

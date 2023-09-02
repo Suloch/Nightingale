@@ -3,12 +3,13 @@
 #include<stdexcept>
 
 #include "window.hpp"
+#include<iostream>
 
 std::vector<const char*> nge::getRequiredExtensions(bool enableValidationLayers) {
     uint32_t glfwExtensionCount = 0;
     const char** glfwExtensions;
     glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
-
+    
     std::vector<const char*> extensions(glfwExtensions, glfwExtensions + glfwExtensionCount);
 
     if (enableValidationLayers) {
@@ -21,7 +22,6 @@ std::vector<const char*> nge::getRequiredExtensions(bool enableValidationLayers)
 
 VkSurfaceKHR nge::Window::createSurface(VkInstance instance){
     VkSurfaceKHR surface;
-
     if (glfwCreateWindowSurface(instance, window, nullptr, &surface) != VK_SUCCESS) {
         throw std::runtime_error("failed to create window surface!");
     }
