@@ -66,7 +66,7 @@ namespace nge{
             GameObject *object;
 
             float calculatePos(float x, float max);
-            void updateUniformBuffer(VkExtent2D extent);
+            void updateUniformBuffer(VkExtent2D extent,float x, float y, float z);
             GameObjectBuffer(VkPhysicalDevice pDevice, VkDevice device, VkQueue graphics, VkCommandPool pool, float x, float y,  float sx, float sy);
             ~GameObjectBuffer();
         

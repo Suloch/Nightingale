@@ -134,12 +134,20 @@ void nge::Nightingale::loadScene(std::string name){
 
 void nge::Nightingale::run(){
     currentFrame = 1; 
+    float x = 0;
+    float y = 0.0000000001;
+    float z = 1.5;
+
     while(!glfwWindowShouldClose(window->window)){
         glfwPollEvents();
         if(glfwGetKey(window->window, GLFW_KEY_W) == GLFW_PRESS){
+            Logger::getInstance().log(z);
+            z += 0.1;
+
         }
+       
         for(auto buffer: buffers){
-            buffer->updateUniformBuffer(device->extent);
+            buffer->updateUniformBuffer(device->extent, x, y, z);
         }
         renderBuffer(
             window,

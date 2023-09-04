@@ -39,11 +39,11 @@ int main(){
         
         app.createTexture("build_main", "textures/SET1_Mainlev_build.png");
 
-        // create gameobjects for each tile and to the children of the platform
+        // // create gameobjects for each tile and to the children of the platform
         nge::GameObject tile1 = nge::GameObject("tile1");
         tile1.properties["texture"] = "build_main";
 
-        // add the texture property for each of the tile
+        // // add the texture property for each of the tile
         app.scenes["default"].gameObjects.push_back(tile1);
 
     // create character
