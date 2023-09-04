@@ -43,18 +43,30 @@ namespace nge{
                 return attributeDescriptions;
             }
     };
+    struct UniformBufferObject {
+        glm::mat4 model;
+        glm::mat4 view;
+        glm::mat4 proj;
+    };
+
     class GameObjectBuffer{
         public:
             VkBuffer indexBuffer;
-            VkBuffer vertexBuffer;
             VkDeviceMemory indexMemory;
-            VkDeviceMemory vertexMemory;
 
+            VkBuffer vertexBuffer;
+            VkDeviceMemory vertexMemory;
+            
+            VkBuffer uniformBuffer;
+            VkDeviceMemory uniformMemory;
+            void *uniformBufferMapped;
+            
             std::string texture;
             
             GameObject *object;
 
-            static float calculatePos(float x, float max);
+            float calculatePos(float x, float max);
+            void updateUniformBuffer(VkExtent2D extent);
             GameObjectBuffer(VkPhysicalDevice pDevice, VkDevice device, VkQueue graphics, VkCommandPool pool, float x, float y,  float sx, float sy);
             ~GameObjectBuffer();
         
@@ -62,5 +74,6 @@ namespace nge{
             VkDevice device;
             void createVertexBuffer(VkPhysicalDevice pDevice, VkDevice device, VkQueue graphics, VkCommandPool pool, const std::vector<Vertex> vertices);
             void createIndexBuffer(VkPhysicalDevice pDevice, VkDevice device, VkQueue graphics, VkCommandPool pool, const std::vector<uint16_t> indices);
+            void createUniformBuffer(VkPhysicalDevice pDevice, VkDevice device);
     };
 }

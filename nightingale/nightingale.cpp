@@ -50,7 +50,6 @@ nge::Nightingale::Nightingale(int height, int width, const char* name){
     command = new Command(device->device, indices.graphicsFamily);
 
     dPool = createDescriptorPool(device->device, MAX_FRAMES_IN_FLIGHT);
-    dLayout = createDescriptorLayout(device->device);
 
     // syncObjects = new SyncObjects(MAX_FRAMES_IN_FLIGHT, device->device);
 
@@ -80,7 +79,6 @@ nge::Nightingale::~Nightingale(){
     // }
     
     vkDestroyDescriptorPool(device->device, dPool, nullptr);
-    vkDestroyDescriptorSetLayout(device->device, dLayout, nullptr);
 
     for(auto buffer: buffers){
         delete buffer;
@@ -121,6 +119,10 @@ void nge::Nightingale::loadScene(std::string name){
                 buffer->texture = object.properties["texture"];
                 buffer->object = &object;
                 buffers.push_back(buffer);
+
+                dSets[buffer->texture] = createDescriptorset(device->device, dPool, pipelineLayout->dSet);
+                updateDescriptorSet(device->device, dSets[buffer->texture], textures[buffer->texture], buffer->uniformBuffer);
+
             }
 
         }
@@ -135,6 +137,9 @@ void nge::Nightingale::run(){
     while(!glfwWindowShouldClose(window->window)){
         glfwPollEvents();
         if(glfwGetKey(window->window, GLFW_KEY_W) == GLFW_PRESS){
+        }
+        for(auto buffer: buffers){
+            buffer->updateUniformBuffer(device->extent);
         }
         renderBuffer(
             window,
@@ -155,8 +160,6 @@ void nge::Nightingale::run(){
 void nge::Nightingale::createTexture(const char* name, const char* filepath){
     Texture *t = new Texture(command->pool, device->graphics, device->physical, device->device, name, filepath);
     textures[name] = t;
-    dSets[name] = createDescriptorset(device->device, dPool, dLayout);
-    updateDescriptorSet(device->device, dSets[name], t);
 }
 
 

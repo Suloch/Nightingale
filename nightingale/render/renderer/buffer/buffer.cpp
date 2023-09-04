@@ -5,6 +5,10 @@
 #include "../../../logger/logger.hpp"
 
 #include<cstring>
+#define GLM_FORCE_RADIANS
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include<chrono>
 
 nge::GameObjectBuffer::GameObjectBuffer(VkPhysicalDevice pDevice, VkDevice device, VkQueue graphics, VkCommandPool pool, float x, float y,  float sx, float sy){
     this->device = device;
@@ -24,6 +28,7 @@ nge::GameObjectBuffer::GameObjectBuffer(VkPhysicalDevice pDevice, VkDevice devic
 
     createVertexBuffer(pDevice, device, graphics, pool, vertices);
     createIndexBuffer(pDevice, device, graphics, pool, indices);
+    createUniformBuffer(pDevice, device);
 }
 void nge::GameObjectBuffer::createVertexBuffer(VkPhysicalDevice pDevice, VkDevice device, VkQueue graphics, VkCommandPool pool, const std::vector<Vertex> vertices){
     VkDeviceSize bufferSize = sizeof(vertices[0]) * vertices.size();
@@ -102,6 +107,27 @@ void nge::GameObjectBuffer::createIndexBuffer(VkPhysicalDevice pDevice, VkDevice
 nge::GameObjectBuffer::~GameObjectBuffer(){
     vkDestroyBuffer(device, indexBuffer, nullptr);
     vkDestroyBuffer(device, vertexBuffer, nullptr);
+    vkDestroyBuffer(device, vertexBuffer, nullptr);
     vkFreeMemory(device, indexMemory, nullptr);
     vkFreeMemory(device, vertexMemory, nullptr);
+    vkFreeMemory(device, uniformMemory, nullptr);
+
+}
+
+void nge::GameObjectBuffer::createUniformBuffer(VkPhysicalDevice pDevice, VkDevice device){
+     VkDeviceSize bufferSize = sizeof(UniformBufferObject);
+     createBuffer(pDevice, device, bufferSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, uniformBuffer, uniformMemory);
+     vkMapMemory(device, uniformMemory, 0, bufferSize, 0, &uniformBufferMapped);
+}
+
+
+void nge::GameObjectBuffer::updateUniformBuffer(VkExtent2D extent){
+
+    UniformBufferObject ubo{};
+    float time = std::chrono::milliseconds(20).count();
+    ubo.model = glm::rotate(glm::mat4(1.0f), time * glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+    ubo.view = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+    ubo.proj = glm::perspective(glm::radians(45.0f), extent.width / (float) extent.height, 0.1f, 10.0f);
+    ubo.proj[1][1] *= -1;
+    memcpy(uniformBufferMapped, &ubo, sizeof(ubo));
 }

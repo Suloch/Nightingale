@@ -45,7 +45,6 @@ namespace nge{
             VkRenderPass renderpass;
 
             VkDescriptorPool dPool;
-            VkDescriptorSetLayout dLayout;
 
             int currentFrame = 0;
             const char *name;

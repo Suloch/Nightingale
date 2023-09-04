@@ -153,6 +153,7 @@ void nge::recordCommandBuffer(
         VkDeviceSize offsets[] = {0};
         vkCmdBindVertexBuffers(cBuffer, 0, 1, vertexBuffers, offsets);
         vkCmdBindIndexBuffer(cBuffer, buffer->indexBuffer, 0, VK_INDEX_TYPE_UINT16);
+
         vkCmdBindDescriptorSets(cBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout->layout, 0, 1, &dSets[buffer->texture], 0, nullptr);
         Vertex2 temp{};
         temp.zoom = glm::float32(3);

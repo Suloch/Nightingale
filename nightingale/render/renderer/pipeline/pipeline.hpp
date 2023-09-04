@@ -14,13 +14,13 @@ namespace nge{
     class PipelineLayout{
         
         private:
-            VkDescriptorSetLayout dSet;
             VkPushConstantRange pcRange={};
             VkDevice device;
-            void createDescriptorSetLayout(VkDevice device);
+            void createDescriptorSetLayout();
             void createPushConstantRange();
 
         public:
+            VkDescriptorSetLayout dSet;
             VkPipelineLayout layout;
             PipelineLayout(VkDevice device);
             ~PipelineLayout();
@@ -57,6 +57,6 @@ namespace nge{
     std::vector<VkDescriptorSet> createDescriptorsets(int maxFrames, VkDevice device, VkDescriptorPool dPool, VkDescriptorSetLayout dLayout);
     VkDescriptorPool createDescriptorPool(VkDevice device, int maxFrames);
     VkDescriptorSetLayout createDescriptorLayout(VkDevice device);
-    void updateDescriptorSet(VkDevice device, VkDescriptorSet descriptorSet,  Texture *t);
+    void updateDescriptorSet(VkDevice device, VkDescriptorSet descriptorSet,  Texture *t, VkBuffer);
     VkDescriptorSet createDescriptorset(VkDevice device, VkDescriptorPool dPool, VkDescriptorSetLayout dLayout);
 }
