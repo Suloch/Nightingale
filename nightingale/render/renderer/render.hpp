@@ -14,8 +14,8 @@ namespace nge{
     PipelineLayout *pipelineLayout, 
     Pipeline *pipeline, 
     VkRenderPass renderPass,
-    GameObjectBuffer *buffer,
-    std::vector<VkDescriptorSet> descriptorSets,
+    std::vector<GameObjectBuffer *> buffers,
+    std::map<std::string, VkDescriptorSet> dSets,
     int currentFrame);
 
     void recordCommandBuffer(
@@ -24,8 +24,8 @@ namespace nge{
     Pipeline *pipeline, 
     VkCommandBuffer cBuffer,  
     VkRenderPass renderPass,
-    GameObjectBuffer *buffer,
-    VkDescriptorSet descriptorSet,
+    std::vector<GameObjectBuffer *> buffers,
+    std::map<std::string, VkDescriptorSet> dSets,
     uint32_t imageIndex
     );
 

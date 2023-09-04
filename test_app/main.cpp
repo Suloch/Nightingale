@@ -13,7 +13,20 @@ int main(){
     
     // create background
         // create a gameobject 
+
+    // create platform
+        // create gameobject for the platform
+        // nge::GameObject plat_object = nge::GameObject("platform");
+
+        // create collider for the platform
+        // nge::Collider collider = nge::Collider("platform", 50, 100, 700, 50);
+
+        // add collider property to the platform
+        // plat_object.properties["collider"] = "platform";
+
+        // load the texture for tile map
         nge::GameObject bg_object = nge::GameObject("bg");    
+        bg_object.setScale(2);
 
         // create a texture
         app.createTexture("bg_tex", "textures/SET1_bakcground_day1.png");
@@ -23,21 +36,15 @@ int main(){
 
         // add object to the scene
         app.scenes["default"].gameObjects.push_back(bg_object);
-
-    // create platform
-        // create gameobject for the platform
-        nge::GameObject plat_object = nge::GameObject("platform");
-
-        // create collider for the platform
-        // nge::Collider collider = nge::Collider("platform", 50, 100, 700, 50);
-
-        // add collider property to the platform
-        // plat_object.properties["collider"] = "platform";
+        
+        app.createTexture("build_main", "textures/SET1_Mainlev_build.png");
 
         // create gameobjects for each tile and to the children of the platform
-        // create textures need for every tile
+        nge::GameObject tile1 = nge::GameObject("tile1");
+        tile1.properties["texture"] = "build_main";
+
         // add the texture property for each of the tile
-        
+        app.scenes["default"].gameObjects.push_back(tile1);
 
     // create character
         // create gameobject for the character

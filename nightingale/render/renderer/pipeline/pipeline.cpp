@@ -248,7 +248,7 @@ nge::SyncObjects::~SyncObjects(){
     }
 }
 
-std::vector<VkDescriptorSet> nge::createDescriptorsets(int maxFrames, VkDevice device, VkDescriptorPool dPool, VkDescriptorSetLayout dLayout, Texture *t){
+std::vector<VkDescriptorSet> nge::createDescriptorsets(int maxFrames, VkDevice device, VkDescriptorPool dPool, VkDescriptorSetLayout dLayout){
     
     std::vector<VkDescriptorSetLayout> layouts(maxFrames, dLayout);
     VkDescriptorSetAllocateInfo allocInfo{};
@@ -263,13 +263,25 @@ std::vector<VkDescriptorSet> nge::createDescriptorsets(int maxFrames, VkDevice d
         throw std::runtime_error("failed to allocate descriptor sets!");
     }
 
-    for (size_t i = 0; i < maxFrames; i++) {
-        // VkDescriptorBufferInfo bufferInfo{};
-        // bufferInfo.buffer = uniformBuffers[i];
-        // bufferInfo.offset = 0;
-        // bufferInfo.range = sizeof(UniformBufferObject);
+    return descriptor_sets;
+}
 
-        VkDescriptorImageInfo imageInfo{};
+VkDescriptorSet nge::createDescriptorset(VkDevice device, VkDescriptorPool dPool, VkDescriptorSetLayout dLayout){
+    std::vector<VkDescriptorSetLayout> layouts(1, dLayout);
+    VkDescriptorSetAllocateInfo allocInfo{};
+    allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+    allocInfo.descriptorPool = dPool;
+    allocInfo.descriptorSetCount = static_cast<uint32_t>(1);
+    allocInfo.pSetLayouts = layouts.data();
+    VkDescriptorSet descriptorSet;
+    if (vkAllocateDescriptorSets(device, &allocInfo, &descriptorSet) != VK_SUCCESS) {
+        throw std::runtime_error("failed to allocate descriptor sets!");
+    }
+    return descriptorSet;
+}
+
+void nge::updateDescriptorSet(VkDevice device, VkDescriptorSet dSet, Texture *t){
+    VkDescriptorImageInfo imageInfo{};
         imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
         imageInfo.imageView = t->view;
         imageInfo.sampler = t->sampler;
@@ -285,7 +297,7 @@ std::vector<VkDescriptorSet> nge::createDescriptorsets(int maxFrames, VkDevice d
         // descriptorWrites[0].pBufferInfo = &bufferInfo;
 
         descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-        descriptorWrites[0].dstSet = descriptor_sets[i];
+        descriptorWrites[0].dstSet = dSet;
         descriptorWrites[0].dstBinding = 0;
         descriptorWrites[0].dstArrayElement = 0;
         descriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
@@ -294,11 +306,7 @@ std::vector<VkDescriptorSet> nge::createDescriptorsets(int maxFrames, VkDevice d
 
         vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
 
-    }
-
-    return descriptor_sets;
 }
-
 
 VkDescriptorPool nge::createDescriptorPool(VkDevice device, int maxFrames){
     VkDescriptorPool dPool;
@@ -306,13 +314,13 @@ VkDescriptorPool nge::createDescriptorPool(VkDevice device, int maxFrames){
     // poolSizes[0].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
     // poolSizes[0].descriptorCount = static_cast<uint32_t>(max_frames);
     poolSizes[0].type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-    poolSizes[0].descriptorCount = static_cast<uint32_t>(maxFrames);
+    poolSizes[0].descriptorCount = 10;
 
     VkDescriptorPoolCreateInfo poolInfo{};
     poolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
-    poolInfo.poolSizeCount = static_cast<uint32_t>(poolSizes.size());
+    poolInfo.poolSizeCount = 10;
     poolInfo.pPoolSizes = poolSizes.data();
-    poolInfo.maxSets = static_cast<uint32_t>(maxFrames);
+    poolInfo.maxSets = 10;
 
     if (vkCreateDescriptorPool(device, &poolInfo, nullptr, &dPool) != VK_SUCCESS) {
         throw std::runtime_error("failed to create descriptor pool!");

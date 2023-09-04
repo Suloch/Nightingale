@@ -26,6 +26,10 @@ nge::GameObject::GameObject(char *name, float x, float y){
     this->y = y;
 }
 
+void nge::GameObject::setScale(float scale){
+    sx = scale;
+    sy = scale;
+}
 nge::GameObject::~GameObject(){
     
 }

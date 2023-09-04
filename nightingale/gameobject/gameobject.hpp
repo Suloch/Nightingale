@@ -17,7 +17,7 @@ namespace nge{
             GameObject(char *name);
             GameObject(char *name, float x, float y);
             ~GameObject();
-        
+            void setScale(float scale);
         private:
             char * name;
         

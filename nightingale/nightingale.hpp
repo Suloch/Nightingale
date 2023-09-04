@@ -34,8 +34,8 @@ namespace nge{
             void createTexture(const char* name, const char*filepath);
             void loadScene(std::string name);
         private:
-            std::map<std::string, std::vector<VkDescriptorSet>> dSets;
-            std::vector<Texture *> textures;
+            std::map<std::string, Texture *> textures;
+            std::map<std::string, VkDescriptorSet> dSets;
             std::vector<GameObjectBuffer *> buffers;
             std::map<std::string, Pipeline *> pipelines;
             Device *device;

@@ -25,7 +25,6 @@ nge::GameObjectBuffer::GameObjectBuffer(VkPhysicalDevice pDevice, VkDevice devic
     createVertexBuffer(pDevice, device, graphics, pool, vertices);
     createIndexBuffer(pDevice, device, graphics, pool, indices);
 }
-
 void nge::GameObjectBuffer::createVertexBuffer(VkPhysicalDevice pDevice, VkDevice device, VkQueue graphics, VkCommandPool pool, const std::vector<Vertex> vertices){
     VkDeviceSize bufferSize = sizeof(vertices[0]) * vertices.size();
 

@@ -71,7 +71,7 @@ nge::Nightingale::Nightingale(int height, int width, const char* name){
 nge::Nightingale::~Nightingale(){
     vkDeviceWaitIdle(device->device);
     for(auto &texture: textures){
-        delete texture;
+        delete texture.second;
     }
     // for(auto dset: dSets){
     //     for(auto &d: dset.second){
@@ -136,19 +136,17 @@ void nge::Nightingale::run(){
         glfwPollEvents();
         if(glfwGetKey(window->window, GLFW_KEY_W) == GLFW_PRESS){
         }
-        for(auto &buffer: buffers){
-            renderBuffer(
-                window,
-                device,
-                command,
-                pipelineLayout,
-                pipelines["default"],
-                renderpass, 
-                buffer,
-                dSets[buffer->texture],
-                currentFrame
-            );
-        }
+        renderBuffer(
+            window,
+            device,
+            command,
+            pipelineLayout,
+            pipelines["default"],
+            renderpass, 
+            buffers,
+            dSets,
+            currentFrame
+        );
         std::this_thread::sleep_for(std::chrono::milliseconds(20));
         currentFrame = (currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
     }
@@ -156,13 +154,15 @@ void nge::Nightingale::run(){
 
 void nge::Nightingale::createTexture(const char* name, const char* filepath){
     Texture *t = new Texture(command->pool, device->graphics, device->physical, device->device, name, filepath);
-    textures.push_back(t);
-    dSets[name] = createDescriptorsets(MAX_FRAMES_IN_FLIGHT, device->device, dPool, dLayout, t);
+    textures[name] = t;
+    dSets[name] = createDescriptorset(device->device, dPool, dLayout);
+    updateDescriptorSet(device->device, dSets[name], t);
 }
 
 
 nge::Scene::Scene(const char *name){
     this->name = name;
+    
 }
 
 nge::Scene::~Scene(){

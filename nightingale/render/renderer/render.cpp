@@ -10,8 +10,8 @@ void nge::renderBuffer(
     PipelineLayout *pipelineLayout, 
     Pipeline *pipeline, 
     VkRenderPass renderPass,
-    GameObjectBuffer *buffer,
-    std::vector<VkDescriptorSet> descriptorSets,
+    std::vector<GameObjectBuffer *> buffers,
+    std::map<std::string, VkDescriptorSet> dSets,
     int currentFrame
 ){
 
@@ -36,15 +36,14 @@ void nge::renderBuffer(
     }
     vkResetFences(device->device, 1,  &pipeline->syncObjects->inFlightFences[currentFrame]);
     vkResetCommandBuffer(command->buffers[currentFrame], /*VkCommandBufferResetFlagBits*/ 0);
-
     recordCommandBuffer(
         device,
         pipelineLayout,
         pipeline,
         command->buffers[currentFrame],
         renderPass,
-        buffer,
-        descriptorSets[currentFrame],
+        buffers,
+        dSets,
         imageIndex
     );
 
@@ -97,8 +96,8 @@ void nge::recordCommandBuffer(
     Pipeline *pipeline, 
     VkCommandBuffer cBuffer,  
     VkRenderPass renderPass,
-    GameObjectBuffer *buffer,
-    VkDescriptorSet descriptorSet,
+    std::vector<GameObjectBuffer *> buffers,
+    std::map<std::string, VkDescriptorSet> dSets,
     uint32_t imageIndex
 ){
 
@@ -139,18 +138,30 @@ void nge::recordCommandBuffer(
     scissor.extent = device->extent;
     vkCmdSetScissor(cBuffer, 0, 1, &scissor);
 
-    VkBuffer vertexBuffers[] = {buffer->vertexBuffer};
-    VkDeviceSize offsets[] = {0};
-    vkCmdBindVertexBuffers(cBuffer, 0, 1, vertexBuffers, offsets);
-    
-    vkCmdBindIndexBuffer(cBuffer, buffer->indexBuffer, 0, VK_INDEX_TYPE_UINT16);
-    vkCmdBindDescriptorSets(cBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout->layout, 0, 1, &descriptorSet, 0, nullptr);
+    std::vector<VkBuffer> vertexBuffers;
+    std::vector<VkDeviceSize> offsets;
+    int i = 0;
+    for(auto buffer: buffers){
+        vertexBuffers.push_back(buffer->vertexBuffer);
+        offsets.push_back(sizeof(buffer->vertexBuffer)*i);
+        i++;
+    }
 
-    Vertex2 temp{};
+    i = 0;
+    for(auto buffer: buffers){
+        VkBuffer vertexBuffers[] = {buffer->vertexBuffer};
+        VkDeviceSize offsets[] = {0};
+        vkCmdBindVertexBuffers(cBuffer, 0, 1, vertexBuffers, offsets);
+        vkCmdBindIndexBuffer(cBuffer, buffer->indexBuffer, 0, VK_INDEX_TYPE_UINT16);
+        vkCmdBindDescriptorSets(cBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout->layout, 0, 1, &dSets[buffer->texture], 0, nullptr);
+        Vertex2 temp{};
+        temp.zoom = glm::float32(3);
+        vkCmdPushConstants(cBuffer, pipelineLayout->layout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(Vertex2), &temp);
+        vkCmdDrawIndexed(cBuffer, static_cast<uint32_t>(6), 1, 0, 0, 0);
+        i++;
+    }    
+
     // temp.pos = glm::vec2(x, 0);
-    temp.zoom = glm::float32(3);
-    vkCmdPushConstants(cBuffer, pipelineLayout->layout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(Vertex2), &temp);
-    vkCmdDrawIndexed(cBuffer, static_cast<uint32_t>(6), 1, 0, 0, 0);
     vkCmdEndRenderPass(cBuffer);
 
     if (vkEndCommandBuffer(cBuffer) != VK_SUCCESS) {

@@ -54,7 +54,9 @@ namespace nge{
             VkShaderModule createShader(VkDevice device, const std::string& filename);  
     };
 
-    std::vector<VkDescriptorSet> createDescriptorsets(int maxFrames, VkDevice device, VkDescriptorPool dPool, VkDescriptorSetLayout dLayout, Texture *t);
+    std::vector<VkDescriptorSet> createDescriptorsets(int maxFrames, VkDevice device, VkDescriptorPool dPool, VkDescriptorSetLayout dLayout);
     VkDescriptorPool createDescriptorPool(VkDevice device, int maxFrames);
     VkDescriptorSetLayout createDescriptorLayout(VkDevice device);
+    void updateDescriptorSet(VkDevice device, VkDescriptorSet descriptorSet,  Texture *t);
+    VkDescriptorSet createDescriptorset(VkDevice device, VkDescriptorPool dPool, VkDescriptorSetLayout dLayout);
 }
