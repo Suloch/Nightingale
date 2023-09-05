@@ -1,0 +1,3 @@
+1. create atlas by joining all texture
+2. create camera
+3. pass tex co-ordinate from dynamic buffer
