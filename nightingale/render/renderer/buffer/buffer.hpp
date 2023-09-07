@@ -47,6 +47,7 @@ namespace nge{
         glm::mat4 model;
         glm::mat4 view;
         glm::mat4 proj;
+        glm::vec3 tex;
     };
 
     class GameObjectBuffer{
@@ -60,7 +61,7 @@ namespace nge{
             VkBuffer uniformBuffer;
             VkDeviceMemory uniformMemory;
             void *uniformBufferMapped;
-            
+
             std::string texture;
             
             GameObject *object;

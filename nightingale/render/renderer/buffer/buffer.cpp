@@ -30,6 +30,8 @@ nge::GameObjectBuffer::GameObjectBuffer(VkPhysicalDevice pDevice, VkDevice devic
     createIndexBuffer(pDevice, device, graphics, pool, indices);
     createUniformBuffer(pDevice, device);
 }
+
+
 void nge::GameObjectBuffer::createVertexBuffer(VkPhysicalDevice pDevice, VkDevice device, VkQueue graphics, VkCommandPool pool, const std::vector<Vertex> vertices){
     VkDeviceSize bufferSize = sizeof(vertices[0]) * vertices.size();
 
@@ -131,10 +133,14 @@ void nge::GameObjectBuffer::updateUniformBuffer(VkExtent2D extent, float x, floa
     // float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
 
     // ubo.model = glm::rotate(glm::mat4(1.0f), glm::radians(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-    ubo.model = glm::mat4(1.0f);
+    ubo.model = glm::translate(glm::mat4(1.0f), glm::vec3(object->currX, object->currY, 0));
+    // ubo.model = glm::mat4(1.0f);
     ubo.view = glm::lookAt(glm::vec3(x, y, z), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
     ubo.proj = glm::perspective(glm::radians(45.0f), extent.width / (float) extent.height, 0.1f, 10.0f);
     ubo.proj[1][1] *= -1;
+    ubo.tex = glm::vec3(object->texScale, object->texOffsetX, object->texOffsetY);
+
     memcpy(uniformBufferMapped, &ubo, sizeof(ubo));
 
 }
+

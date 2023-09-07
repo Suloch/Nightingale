@@ -120,8 +120,8 @@ void nge::Nightingale::loadScene(std::string name){
                 buffer->object = &object;
                 buffers.push_back(buffer);
 
-                dSets[buffer->texture] = createDescriptorset(device->device, dPool, pipelineLayout->dSet);
-                updateDescriptorSet(device->device, dSets[buffer->texture], textures[buffer->texture], buffer->uniformBuffer);
+                dSets[object.name] = createDescriptorset(device->device, dPool, pipelineLayout->dSet);
+                updateDescriptorSet(device->device, dSets[object.name], textures[buffer->texture], buffer->uniformBuffer);
 
             }
 
@@ -129,7 +129,6 @@ void nge::Nightingale::loadScene(std::string name){
     }else{
         throw std::runtime_error("Could not find scene with that name");
     }
-
 }
 
 void nge::Nightingale::run(){
@@ -137,15 +136,27 @@ void nge::Nightingale::run(){
     float x = 0;
     float y = 0.0000000001;
     float z = 1.5;
-
+    float k = 0;
+    float l = 0.2;
     while(!glfwWindowShouldClose(window->window)){
         glfwPollEvents();
         if(glfwGetKey(window->window, GLFW_KEY_W) == GLFW_PRESS){
-            Logger::getInstance().log(z);
-            z += 0.1;
-
+            k+=0.01;
         }
-       
+        if(glfwGetKey(window->window, GLFW_KEY_S) == GLFW_PRESS){
+            k-=0.01;
+        }
+        if(glfwGetKey(window->window, GLFW_KEY_D) == GLFW_PRESS){
+            l+=0.01;
+        }
+        if(glfwGetKey(window->window, GLFW_KEY_A) == GLFW_PRESS){
+            l-=0.01;
+        }
+        // scenes["default"].gameObjects[1].texOffsetY = k;
+        // scenes["default"].gameObjects[1].texScale = l;
+        // Logger::getInstance().log(l);
+        // Logger::getInstance().log(k);
+    
         for(auto buffer: buffers){
             buffer->updateUniformBuffer(device->extent, x, y, z);
         }

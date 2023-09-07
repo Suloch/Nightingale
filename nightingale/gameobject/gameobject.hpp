@@ -11,15 +11,22 @@ namespace nge{
             float sx = 1.0f; //x-scale
             float sy = 1.0f; //y-scale
             float r; //rotation in radians
+            float texScale;
+            float texOffsetX;
+            float texOffsetY;
+            float currX = 0;
+            float currY = 0;
             std::map<std::string, std::string> properties;
+            std::string name;
 
             GameObject();
-            GameObject(char *name);
-            GameObject(char *name, float x, float y);
+            GameObject(std::string name);
+            GameObject(std::string name, float x, float y);
             ~GameObject();
             void setScale(float scale);
+            void setTexScale(float scale, float x, float y);
+            void setPosition(float x, float y);
         private:
-            char * name;
         
     };
 } // namespace nge

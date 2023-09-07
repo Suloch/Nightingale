@@ -5,6 +5,7 @@
 
 #include<iostream>
 #include <vector>
+#include<string>
 
 int main(){
     // create the instance which create a default scene
@@ -40,11 +41,21 @@ int main(){
         app.createTexture("build_main", "textures/SET1_Mainlev_build.png");
 
         // // create gameobjects for each tile and to the children of the platform
-        nge::GameObject tile1 = nge::GameObject("tile1");
-        tile1.properties["texture"] = "build_main";
+        float offset = 0.15;
+        for(int i = 0; i < 7; i++){
+            std::string tile_name = "tile" + std::to_string(i);
+            nge::GameObject tile1 = nge::GameObject(tile_name);
+            tile1.setScale(0.15);
+            tile1.setTexScale(0.07, 0.0, 0.42);
+            tile1.setPosition(0.5-i*offset, 0.25);
+            tile1.properties["texture"] = "build_main";
 
-        // // add the texture property for each of the tile
-        app.scenes["default"].gameObjects.push_back(tile1);
+            // // add the texture property for each of the tile
+            app.scenes["default"].gameObjects.push_back(tile1);
+        }
+           
+           
+
 
     // create character
         // create gameobject for the character
