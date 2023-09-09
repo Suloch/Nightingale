@@ -10,25 +10,23 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include<chrono>
 
-nge::GameObjectBuffer::GameObjectBuffer(VkPhysicalDevice pDevice, VkDevice device, VkQueue graphics, VkCommandPool pool, float x, float y,  float sx, float sy){
+nge::GameObjectBuffer::GameObjectBuffer(VkPhysicalDevice pDevice, VkDevice device, VkQueue graphics, VkCommandPool pool){
     this->device = device;
-    x = x - sx / 2 ;
-    y = y - sy / 2;
 
-    const std::vector<Vertex> vertices = {
-        {{x, y}, {0.0f, 0.0f, 1.0f}, {1.0f, 0.0f}},
-        {{-x, y}, {0.0f, 0.0f, 1.0f}, {0.0f, 0.0f}},
-        {{-x, -y}, {0.0f, 0.0f, 1.0f}, {0.0f, 1.0f}},
-        {{x, -y}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}}
+    std::vector<Vertex> vertices ={
+        {{1, 1}, {0.0f, 0.0f, 1.0f}, {1.0f, 1.0f}},
+        {{-1, 1}, {0.0f, 0.0f, 1.0f}, {0.0f, 1.0f}},
+        {{-1, -1}, {0.0f, 0.0f, 1.0f}, {0.0f, 0.0f}},
+        {{1, -1}, {1.0f, 1.0f, 1.0f}, {1.0f, 0.0f}}
     };
-
-    const std::vector<uint16_t> indices = {
-        0, 1, 2, 2, 3, 0
+    std::vector<uint16_t>indices = {
+            0, 1, 2, 2, 3, 0
     };
-
     createVertexBuffer(pDevice, device, graphics, pool, vertices);
     createIndexBuffer(pDevice, device, graphics, pool, indices);
     createUniformBuffer(pDevice, device);
+
+    
 }
 
 
@@ -123,7 +121,7 @@ void nge::GameObjectBuffer::createUniformBuffer(VkPhysicalDevice pDevice, VkDevi
 }
 
 
-void nge::GameObjectBuffer::updateUniformBuffer(VkExtent2D extent, float x, float y, float z){
+void nge::GameObjectBuffer::updateUniformBuffer(VkExtent2D extent, float x, float y, float z, float ar){
 
     UniformBufferObject ubo{};
     // float time = std::chrono::milliseconds(20).count();
@@ -132,15 +130,24 @@ void nge::GameObjectBuffer::updateUniformBuffer(VkExtent2D extent, float x, floa
     // auto currentTime = std::chrono::high_resolution_clock::now();
     // float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
 
-    // ubo.model = glm::rotate(glm::mat4(1.0f), glm::radians(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-    ubo.model = glm::translate(glm::mat4(1.0f), glm::vec3(object->currX, object->currY, 0));
+   
+    ubo.model = glm::translate(glm::mat4(1.0f), glm::vec3(object->transform->getX(), object->transform->getY(), 0));
+    ubo.model = glm::scale(ubo.model, glm::vec3(object->transform->scaleX, object->transform->scaleY, 1));
+    ubo.model = glm::rotate(ubo.model, glm::radians(object->transform->rot), glm::vec3(0.0f, 0.0f, 1.0f));
     // ubo.model = glm::mat4(1.0f);
     ubo.view = glm::lookAt(glm::vec3(x, y, z), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
     ubo.proj = glm::perspective(glm::radians(45.0f), extent.width / (float) extent.height, 0.1f, 10.0f);
     ubo.proj[1][1] *= -1;
-    ubo.tex = glm::vec3(object->texScale, object->texOffsetX, object->texOffsetY);
+    // ubo.tex = glm::mat2(1.0f) * glm::mat2();
 
+    ubo.tbo.flipX = object->flipX;
+    ubo.tbo.flipY = object->flipY;
+    ubo.tbo.scale = object->texScale;
+    ubo.tbo.ar = ar*object->transform->scaleX/object->transform->scaleY;
+    ubo.tbo.x = object->texOffsetX;
+    ubo.tbo.y = object->texOffsetY;
     memcpy(uniformBufferMapped, &ubo, sizeof(ubo));
+
 
 }
 

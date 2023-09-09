@@ -13,11 +13,10 @@ namespace nge{
             VkCommandPool commandPool;
             VkQueue graphics;
             int height;
-            int width;
             int channels;
+            int width;
             const char *name;
             const char* path;
-
             void createTextureImage();
             void createImage(VkFormat format,  VkImageTiling tiling,  VkImageUsageFlags usage,  VkMemoryPropertyFlags properties);
             void transitionImageLayout(VkFormat format, VkImageLayout oldLayout, VkImageLayout newLayout);
@@ -26,9 +25,12 @@ namespace nge{
             void createSampler();
             
         public:
+            int flipX = 1;
+            int flipY = 1;
             VkImageView view;
             VkSampler sampler;
             Texture(VkCommandPool commandPool, VkQueue graphics, VkPhysicalDevice pDevice, VkDevice device, const char* name, const char* filepath);
             ~Texture();
+            float getAspectRatio();
     };
 }

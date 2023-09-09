@@ -14,7 +14,7 @@ namespace nge{
             Scene(){}
             Scene(const char* name);
             ~Scene();
-            std::vector<GameObject> gameObjects;
+            std::vector<GameObject *> gameObjects;
         private:
             const char *name;
     };
@@ -33,6 +33,7 @@ namespace nge{
             void run();
             void createTexture(const char* name, const char*filepath);
             void loadScene(std::string name);
+            
         private:
             std::map<std::string, Texture *> textures;
             std::map<std::string, VkDescriptorSet> dSets;

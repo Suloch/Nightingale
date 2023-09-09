@@ -138,16 +138,9 @@ void nge::recordCommandBuffer(
     scissor.extent = device->extent;
     vkCmdSetScissor(cBuffer, 0, 1, &scissor);
 
-    std::vector<VkBuffer> vertexBuffers;
-    std::vector<VkDeviceSize> offsets;
     int i = 0;
-    for(auto buffer: buffers){
-        vertexBuffers.push_back(buffer->vertexBuffer);
-        offsets.push_back(sizeof(buffer->vertexBuffer)*i);
-        i++;
-    }
+    
 
-    i = 0;
     for(auto buffer: buffers){
         VkBuffer vertexBuffers[] = {buffer->vertexBuffer};
         VkDeviceSize offsets[] = {0};

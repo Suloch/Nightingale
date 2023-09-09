@@ -4,6 +4,7 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 #include <stdexcept>
+#include "../../logger/logger.hpp"
 
 nge::Texture::Texture(VkCommandPool commandPool, VkQueue graphics, VkPhysicalDevice pDevice, VkDevice device, const char* name, const char* filepath):device(device){
     this->graphics=graphics;
@@ -223,4 +224,8 @@ void nge::Texture::createSampler(){
     if (vkCreateSampler(device, &samplerInfo, nullptr, &sampler) != VK_SUCCESS) {
         throw std::runtime_error("failed to create texture sampler!");
     }
+}
+
+float nge::Texture::getAspectRatio(){
+    return height/(float)width;
 }

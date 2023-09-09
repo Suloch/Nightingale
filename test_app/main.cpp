@@ -1,7 +1,6 @@
 
 
 # include "../nightingale/nightingale.hpp"
-#include "nightingale/logger/logger.hpp"
 
 #include<iostream>
 #include <vector>
@@ -9,15 +8,36 @@
 
 int main(){
     // create the instance which create a default scene
+    const int height = 600;
+    const int width = 800;
+
     nge::Nightingale app =  nge::Nightingale(600, 800, "Test");
 
     
     // create background
         // create a gameobject 
 
+        nge::GameObject *bg_object = new nge::GameObject("bg", height/2, width/2);    
+        // bg_object->transform->scaleX = 0.5;
+        // bg_object->transform->scaleY = 0.5;
+
+        // bg_object->transform->x = 100;
+        // bg_object->transform->y = 100;
+
+        // bg_object.setScale(2);
+
+        // create a texture
+        app.createTexture("bg_tex", "textures/SET1_bakcground_day1.png");
+
+        // add texture property to gameobject
+        bg_object->properties["texture"] = "bg_tex";
+
+        // add object to the scene
+        app.scenes["default"].gameObjects.push_back(bg_object);
+        
     // create platform
         // create gameobject for the platform
-        // nge::GameObject plat_object = nge::GameObject("platform");
+        // nge::GameObject plat_object = nge::GameObject("platform", height/2, width/2);
 
         // create collider for the platform
         // nge::Collider collider = nge::Collider("platform", 50, 100, 700, 50);
@@ -26,29 +46,21 @@ int main(){
         // plat_object.properties["collider"] = "platform";
 
         // load the texture for tile map
-        nge::GameObject bg_object = nge::GameObject("bg");    
-        bg_object.setScale(2);
-
-        // create a texture
-        app.createTexture("bg_tex", "textures/SET1_bakcground_day1.png");
-
-        // add texture property to gameobject
-        bg_object.properties["texture"] = "bg_tex";
-
-        // add object to the scene
-        app.scenes["default"].gameObjects.push_back(bg_object);
         
         app.createTexture("build_main", "textures/SET1_Mainlev_build.png");
-
         // // create gameobjects for each tile and to the children of the platform
-        float offset = 0.15;
-        for(int i = 0; i < 7; i++){
+        float offset = 0.19*width/2;
+        for(int i = 0; i < 5; i++){
+
             std::string tile_name = "tile" + std::to_string(i);
-            nge::GameObject tile1 = nge::GameObject(tile_name);
-            tile1.setScale(0.15);
-            tile1.setTexScale(0.07, 0.0, 0.42);
-            tile1.setPosition(0.5-i*offset, 0.25);
-            tile1.properties["texture"] = "build_main";
+            nge::GameObject *tile1 = new nge::GameObject(tile_name, height/2, width/2);
+            tile1->transform->scaleX=0.1;
+            tile1->transform->scaleY=0.1;
+            tile1->transform->rot = 180;
+            tile1->setTexScale(0.06, 0.0, 0.51);
+            tile1->transform->x = -i*offset;
+            tile1->transform->y = 100;
+            tile1->properties["texture"] = "build_main";
 
             // // add the texture property for each of the tile
             app.scenes["default"].gameObjects.push_back(tile1);
@@ -57,13 +69,29 @@ int main(){
            
 
 
+        app.createTexture("character_idle", "textures/Idle-Sheet.png");
     // create character
         // create gameobject for the character
-        // create the collider for the character
-        // create the texture for the character
-        // add the collider property 
+        nge::GameObject *character = new nge::GameObject("character", height/2, width/2);
+        // character->transform->rot = 180;
+        character->flipX = -1;
+        character->transform->y = -100;
+        character->transform->scaleY = 0.16*1.5;
+        character->transform->scaleX = 0.12*1.5;
+        // character->transform->rot = 180;
+        character->setTexScale(0.75, 0.49, 0.07);
+
+
+
         // add the texture property
+        character->properties["texture"] = "character_idle";
+
+        app.scenes["default"].gameObjects.push_back(character);
+
+
         // create rigid body for character
+
+
         // add rigid body property
         
 

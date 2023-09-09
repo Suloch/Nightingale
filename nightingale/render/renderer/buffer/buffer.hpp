@@ -43,13 +43,20 @@ namespace nge{
                 return attributeDescriptions;
             }
     };
+    struct TextureBufferObject{
+        glm::float32 scale;
+        glm::float32 ar;
+        glm::float32 x;
+        glm::float32 y;
+        glm::int32 flipX;
+        glm::int32 flipY;
+    };
     struct UniformBufferObject {
         glm::mat4 model;
         glm::mat4 view;
         glm::mat4 proj;
-        glm::vec3 tex;
+        TextureBufferObject tbo{};  
     };
-
     class GameObjectBuffer{
         public:
             VkBuffer indexBuffer;
@@ -66,9 +73,8 @@ namespace nge{
             
             GameObject *object;
 
-            float calculatePos(float x, float max);
-            void updateUniformBuffer(VkExtent2D extent,float x, float y, float z);
-            GameObjectBuffer(VkPhysicalDevice pDevice, VkDevice device, VkQueue graphics, VkCommandPool pool, float x, float y,  float sx, float sy);
+            void updateUniformBuffer(VkExtent2D extent,float x, float y, float z, float ar);
+            GameObjectBuffer(VkPhysicalDevice pDevice, VkDevice device, VkQueue graphics, VkCommandPool pool);
             ~GameObjectBuffer();
         
         private:
