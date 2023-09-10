@@ -23,6 +23,7 @@ namespace nge{
     
 
         public:
+            Physics2D physic2d;
             const int MAX_FRAMES_IN_FLIGHT = 2;
 
             std::map<std::string, Scene> scenes;
@@ -44,7 +45,7 @@ namespace nge{
             PipelineLayout *pipelineLayout;
             Command *command;
             VkRenderPass renderpass;
-
+            
             VkDescriptorPool dPool;
 
             int currentFrame = 0;

@@ -65,7 +65,7 @@ nge::Nightingale::Nightingale(int height, int width, const char* name){
             nullptr,
             nullptr
         );
-
+    
 }
 
 nge::Nightingale::~Nightingale(){
@@ -139,6 +139,7 @@ void nge::Nightingale::run(){
     float k = -100;
     float l = 0 ;
     while(!glfwWindowShouldClose(window->window)){
+
         glfwPollEvents();
         if(glfwGetKey(window->window, GLFW_KEY_W) == GLFW_PRESS){
             k+=10;
@@ -153,14 +154,13 @@ void nge::Nightingale::run(){
             l-=10;
         }
         // scenes["default"].gameObjects[6]->transform->scaleX = k;
-        scenes["default"].gameObjects[6]->transform->x = l;
-        scenes["default"].gameObjects[6]->transform->y = k;
+        // scenes["default"].gameObjects[6]->transform->x = l;
+        // scenes["default"].gameObjects[6]->transform->y = k;
         // Logger::getInstance().log(l, ": ", k);
     
         for(auto buffer: buffers){
             buffer->updateUniformBuffer(device->extent, x, y, z, textures[buffer->texture]->getAspectRatio());
         }
-
         renderBuffer(
             window,
             device,
@@ -172,7 +172,8 @@ void nge::Nightingale::run(){
             dSets,
             currentFrame
         );
-
+        physic2d.step(std::chrono::milliseconds(20).count()/100.0f);
+        
         std::this_thread::sleep_for(std::chrono::milliseconds(20));
         currentFrame = (currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
     }

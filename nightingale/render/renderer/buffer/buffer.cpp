@@ -130,6 +130,7 @@ void nge::GameObjectBuffer::updateUniformBuffer(VkExtent2D extent, float x, floa
     // auto currentTime = std::chrono::high_resolution_clock::now();
     // float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
 
+    // Logger::getInstance().log("Y: ",  object->transform->getY(), "Y: ", object->transform->y);
    
     ubo.model = glm::translate(glm::mat4(1.0f), glm::vec3(object->transform->getX(), object->transform->getY(), 0));
     ubo.model = glm::scale(ubo.model, glm::vec3(object->transform->scaleX, object->transform->scaleY, 1));

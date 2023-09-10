@@ -82,13 +82,12 @@ int main(){
         character->setTexScale(0.75, 0.49, 0.07);
 
 
-
         // add the texture property
         character->properties["texture"] = "character_idle";
 
         app.scenes["default"].gameObjects.push_back(character);
 
-
+        app.physic2d.addRigidBody2D(character->transform);
         // create rigid body for character
 
 

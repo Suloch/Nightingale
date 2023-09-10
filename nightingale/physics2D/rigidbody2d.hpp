@@ -11,7 +11,11 @@ namespace nge{
         public:
             float mass;
             float gravity;
-            float velocity;
+            float velocityX;
+            float velocityY;
             bool dynamic;
+            RigidBody2D(Transform2D *t);
+            ~RigidBody2D(){}
+            void update(float dt);
     };
 }
