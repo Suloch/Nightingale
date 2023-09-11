@@ -5,32 +5,39 @@
 #include "transform2D.hpp"
 
 namespace nge{
-    
+    enum ColliderType{
+        BOX
+    };
+    class Collision2D{
+        void *col1;
+        void *col2;
+
+        public:
+            Collision2D(void *col1, void *col2);
+            void resolve();
+    };
+
     class Collider2D{
         Transform2D * transform;
         public:
-            std::string type;
+            ColliderType type;
+            virtual Collision2D * test(Collider2D *);
 
     };
 
-    class Collision2D{
-        Collider2D *col1;
-        Collider2D *col2;
-    };
 
 
     class BoxCollider2D: public Collider2D{
         
-        private:
-            float startX;
-            float startY;
-            float endX;
-            float endY;
 
         public:
-
-            BoxCollider2D(float startX, float startY, float endX, float endY);
-            ~BoxCollider2D();
+            float centerX;
+            float centerY;
+            float height;
+            float width;
+            Collision2D * test(Collider2D *);
+            BoxCollider2D(float centerX, float centerY, float height, float width);
 
     };
+    Collision2D *testBox_Box(BoxCollider2D* box1, BoxCollider2D * box2);
 } // namespace nge

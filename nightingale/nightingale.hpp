@@ -45,7 +45,7 @@ namespace nge{
             PipelineLayout *pipelineLayout;
             Command *command;
             VkRenderPass renderpass;
-            
+            Interface *interface;
             VkDescriptorPool dPool;
 
             int currentFrame = 0;

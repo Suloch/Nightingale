@@ -2,6 +2,7 @@
 #include "nightingale.hpp"
 #include "logger/logger.hpp"
 #include "renderer/pass/renderpass.hpp"
+#include "third-party/imgui/interface.hpp"
 
 #include<thread>
 #include<chrono>
@@ -66,10 +67,13 @@ nge::Nightingale::Nightingale(int height, int width, const char* name){
             nullptr
         );
     
+    interface = new Interface(device->device, window->window, device->physical, device->instance, device->graphics);
+    
 }
 
 nge::Nightingale::~Nightingale(){
     vkDeviceWaitIdle(device->device);
+    delete interface;
     for(auto &texture: textures){
         delete texture.second;
     }
@@ -98,6 +102,8 @@ nge::Nightingale::~Nightingale(){
     delete window;
     
     delete device;
+
+    
 
 }
 
@@ -157,7 +163,13 @@ void nge::Nightingale::run(){
         // scenes["default"].gameObjects[6]->transform->x = l;
         // scenes["default"].gameObjects[6]->transform->y = k;
         // Logger::getInstance().log(l, ": ", k);
-    
+        
+        ImGui_ImplVulkan_NewFrame();
+        ImGui_ImplGlfw_NewFrame();
+        ImGui::NewFrame();
+        ImGui::Render();
+        ImDrawData* drawData = ImGui::GetDrawData();
+
         for(auto buffer: buffers){
             buffer->updateUniformBuffer(device->extent, x, y, z, textures[buffer->texture]->getAspectRatio());
         }
@@ -170,7 +182,8 @@ void nge::Nightingale::run(){
             renderpass, 
             buffers,
             dSets,
-            currentFrame
+            currentFrame,
+            drawData
         );
         physic2d.step(std::chrono::milliseconds(20).count()/100.0f);
         
