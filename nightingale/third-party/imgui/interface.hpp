@@ -4,7 +4,7 @@
 #include "imgui.h"
 #include "imgui_impl_vulkan.h"
 #include "imgui_impl_glfw.h"
-
+#include <vector>
 namespace nge
 {
     class Interface{
@@ -14,7 +14,15 @@ namespace nge
 	        VkDescriptorPool imguiPool;
 
         public:
-            Interface(VkDevice device, GLFWwindow *window, VkPhysicalDevice pDevice, VkInstance instance, VkQueue gQueue, VkRenderPass renderpass);
+            Interface(
+                VkDevice device, 
+                GLFWwindow *window, 
+                VkPhysicalDevice pDevice, 
+                VkInstance instance, 
+                VkQueue gQueue, 
+                VkRenderPass renderpass,
+                VkCommandPool commandPool
+            );
             ~Interface();
             
     };

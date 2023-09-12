@@ -24,16 +24,13 @@ nge::BoxCollider2D::BoxCollider2D(float centerX, float centerY, float height, fl
     this->width = width;
 }
 
-nge::Collision2D* nge::BoxCollider2D::test(nge::Collider2D *col){
+nge::Collision2D* nge::BoxCollider2D::test(Collider2D *col){
     switch (col->type)
     {
     case BOX:
         BoxCollider2D * bc = static_cast<BoxCollider2D *>(col);
         
         return testBox_Box(this, bc);
-    
-    default:
-        break;
     }
 }
 

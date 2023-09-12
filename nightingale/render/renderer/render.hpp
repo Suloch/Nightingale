@@ -6,6 +6,7 @@
 #include "renderer/command/command.hpp"
 #include "renderer/buffer/buffer.hpp"
 #include "../../window/window.hpp"
+#include "../../third-party/imgui/interface.hpp"
 
 namespace nge{
     void renderBuffer(Window *window,
@@ -16,17 +17,21 @@ namespace nge{
     VkRenderPass renderPass,
     std::vector<GameObjectBuffer *> buffers,
     std::map<std::string, VkDescriptorSet> dSets,
-    int currentFrame);
+    int currentFrame,
+    ImDrawData *drawData
+
+    );
 
     void recordCommandBuffer(
         Device *device, 
-    PipelineLayout *pipelineLayout, 
-    Pipeline *pipeline, 
-    VkCommandBuffer cBuffer,  
-    VkRenderPass renderPass,
-    std::vector<GameObjectBuffer *> buffers,
-    std::map<std::string, VkDescriptorSet> dSets,
-    uint32_t imageIndex
+        PipelineLayout *pipelineLayout, 
+        Pipeline *pipeline, 
+        VkCommandBuffer cBuffer,  
+        VkRenderPass renderPass,
+        std::vector<GameObjectBuffer *> buffers,
+        std::map<std::string, VkDescriptorSet> dSets,
+        uint32_t imageIndex,
+        ImDrawData *drawData
     );
 
     void reCreateSwapChain(

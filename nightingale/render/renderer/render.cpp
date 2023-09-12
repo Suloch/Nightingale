@@ -12,7 +12,8 @@ void nge::renderBuffer(
     VkRenderPass renderPass,
     std::vector<GameObjectBuffer *> buffers,
     std::map<std::string, VkDescriptorSet> dSets,
-    int currentFrame
+    int currentFrame,
+    ImDrawData *drawData
 ){
 
     vkWaitForFences(device->device, 1, &pipeline->syncObjects->inFlightFences[currentFrame], VK_TRUE, UINT64_MAX);
@@ -44,7 +45,8 @@ void nge::renderBuffer(
         renderPass,
         buffers,
         dSets,
-        imageIndex
+        imageIndex,
+        drawData
     );
 
 
@@ -98,7 +100,8 @@ void nge::recordCommandBuffer(
     VkRenderPass renderPass,
     std::vector<GameObjectBuffer *> buffers,
     std::map<std::string, VkDescriptorSet> dSets,
-    uint32_t imageIndex
+    uint32_t imageIndex,
+    ImDrawData *drawData
 ){
 
     VkCommandBufferBeginInfo beginInfo{};
@@ -155,6 +158,7 @@ void nge::recordCommandBuffer(
     }    
 
     // temp.pos = glm::vec2(x, 0);
+    ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), cBuffer);
     vkCmdEndRenderPass(cBuffer);
 
     if (vkEndCommandBuffer(cBuffer) != VK_SUCCESS) {

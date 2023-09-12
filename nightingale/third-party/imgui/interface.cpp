@@ -3,8 +3,18 @@
 #include "interface.hpp"
 #include <stdexcept>
 #include <GLFW/glfw3.h>
+#include "../../render/utils.hpp"
 
-nge::Interface::Interface(VkDevice device, GLFWwindow *window, VkPhysicalDevice pDevice, VkInstance instance, VkQueue gQueue, VkRenderPass renderpass){
+nge::Interface::Interface(
+	VkDevice device, 
+	GLFWwindow *window, 
+	VkPhysicalDevice pDevice, 
+	VkInstance instance, 
+	VkQueue gQueue, 
+	VkRenderPass renderpass,
+	VkCommandPool commandPool
+	){
+	this->device = device;
     VkDescriptorPoolSize pool_sizes[] =
 	{
 		{ VK_DESCRIPTOR_TYPE_SAMPLER, 1000 },
@@ -28,11 +38,10 @@ nge::Interface::Interface(VkDevice device, GLFWwindow *window, VkPhysicalDevice 
 	pool_info.pPoolSizes = pool_sizes;
 
 	if(vkCreateDescriptorPool(device, &pool_info, nullptr, &this->imguiPool) != VK_SUCCESS){
-        
+        throw std::runtime_error("cannot create imgui pool");
     }
 
 
-	// 2: initialize imgui library
 
 	//this initializes the core structures of imgui
 	ImGui::CreateContext();
@@ -60,12 +69,13 @@ nge::Interface::Interface(VkDevice device, GLFWwindow *window, VkPhysicalDevice 
 
 	ImGui_ImplVulkan_Init(&init_info, renderpass);
 
-	// immediate_submit([&](VkCommandBuffer cmd) {
-	// 	ImGui_ImplVulkan_CreateFontsTexture(cmd);
-	// 	});
-
-	//clear font textures from cpu data
-	// ImGui_ImplVulkan_DestroyFontUploadObjects();
+	// Upload Fonts
+    {
+        VkCommandBuffer cmd = beginSingleTimeCommands(commandPool, device);
+		ImGui_ImplVulkan_CreateFontsTexture(cmd);
+        endSingleTimeCommands(commandPool, cmd, device, gQueue);
+        ImGui_ImplVulkan_DestroyFontUploadObjects();
+    }
 
 }
 

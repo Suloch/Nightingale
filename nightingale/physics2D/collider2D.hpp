@@ -21,7 +21,7 @@ namespace nge{
         Transform2D * transform;
         public:
             ColliderType type;
-            virtual Collision2D * test(Collider2D *);
+            virtual Collision2D * test(Collider2D *){return nullptr;}
 
     };
 

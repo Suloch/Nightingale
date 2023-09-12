@@ -67,7 +67,15 @@ nge::Nightingale::Nightingale(int height, int width, const char* name){
             nullptr
         );
     
-    interface = new Interface(device->device, window->window, device->physical, device->instance, device->graphics);
+    interface = new Interface(
+        device->device, 
+        window->window, 
+        device->physical, 
+        device->instance, 
+        device->graphics, 
+        renderpass,
+        command->pool
+    );
     
 }
 
@@ -167,6 +175,7 @@ void nge::Nightingale::run(){
         ImGui_ImplVulkan_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
+        ImGui::ShowDemoWindow();
         ImGui::Render();
         ImDrawData* drawData = ImGui::GetDrawData();
 
