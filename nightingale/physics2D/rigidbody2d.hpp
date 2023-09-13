@@ -6,9 +6,9 @@
 namespace nge{
     class RigidBody2D{
         private:
-            Transform2D * transform;
 
         public:
+            Transform2D * transform;
             float mass;
             float gravity;
             float velocityX;

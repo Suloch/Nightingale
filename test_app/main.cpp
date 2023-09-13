@@ -49,23 +49,43 @@ int main(){
         
         app.createTexture("build_main", "textures/SET1_Mainlev_build.png");
         // // create gameobjects for each tile and to the children of the platform
-        float offset = 0.19*width/2;
-        for(int i = 0; i < 5; i++){
+        // float offset = 0.19*width/2;
+        // for(int i = 0; i < 5; i++){
 
-            std::string tile_name = "tile" + std::to_string(i);
-            nge::GameObject *tile1 = new nge::GameObject(tile_name, height/2, width/2);
-            tile1->transform->scaleX=0.1;
-            tile1->transform->scaleY=0.1;
-            tile1->transform->rot = 180;
-            tile1->setTexScale(0.06, 0.0, 0.51);
-            tile1->transform->x = -i*offset;
-            tile1->transform->y = 100;
-            tile1->properties["texture"] = "build_main";
+        //     std::string tile_name = "tile" + std::to_string(i);
+        //     nge::GameObject *tile1 = new nge::GameObject(tile_name, height/2, width/2);
+        //     tile1->transform->scaleX=0.1;
+        //     tile1->transform->scaleY=0.1;
+        //     tile1->transform->rot = 180;
+        //     tile1->setTexScale(0.06, 0.0, 0.51);
+        //     tile1->transform->x = -i*offset;
+        //     tile1->transform->y = 100;
+        //     tile1->properties["texture"] = "build_main";
 
-            // // add the texture property for each of the tile
-            app.scenes["default"].gameObjects.push_back(tile1);
-        }
-           
+        //     // // add the texture property for each of the tile
+        //     app.scenes["default"].gameObjects.push_back(tile1);
+        // }
+        nge::GameObject *tile1 = new nge::GameObject("plat", height/2, width/2);
+        tile1->transform->scaleX=1;
+        tile1->transform->scaleY=0.1;
+        tile1->transform->rot = 180;
+        tile1->setTexScale(0.1, 0.0, 0);
+        tile1->transform->x = 0;
+        tile1->transform->y = 100;
+        tile1->properties["texture"] = "build_main";
+        app.scenes["default"].gameObjects.push_back(tile1);
+
+        nge::RigidBody2D * platRB = app.physic2d.addRigidBody2D(tile1->transform);     
+        platRB->dynamic = false;
+
+        app.physic2d.addBoxCollider2D(
+            platRB,
+            tile1->transform,
+            0,
+            0,
+            50,
+            600
+        );
            
 
 
@@ -87,7 +107,15 @@ int main(){
 
         app.scenes["default"].gameObjects.push_back(character);
 
-        app.physic2d.addRigidBody2D(character->transform);
+        nge::RigidBody2D* rb =  app.physic2d.addRigidBody2D(character->transform);
+        app.physic2d.addBoxCollider2D(
+            rb,
+            character->transform,
+            0,
+            0,
+            10,
+            10
+        );
         // create rigid body for character
 
 

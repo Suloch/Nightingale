@@ -22,8 +22,8 @@ namespace nge{
 
             
             void step(float dt);
-            void addBoxCollider2D(Transform2D* transfrom, int startX, int startY, int endX, int endY);
-            void addRigidBody2D(Transform2D* transform);
+            void addBoxCollider2D(RigidBody2D *rb, Transform2D* transfrom, float centerX, float centerY, float height, float width);
+            RigidBody2D* addRigidBody2D(Transform2D* transform);
             void detectCollisions();
             void resolveCollisions();
             
