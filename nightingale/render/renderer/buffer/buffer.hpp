@@ -6,10 +6,12 @@
 #include<vector>
 #include<string>
 #include "../../gameobject/gameobject.hpp"
+#include "../../gameobject/camera.hpp"
+
 
 namespace nge{
     struct Vertex {
-        glm::vec2 pos;
+        glm::vec3 pos;
         glm::vec3 color;
         glm::vec2 texCoord;
 
@@ -73,7 +75,7 @@ namespace nge{
             
             GameObject *object;
 
-            void updateUniformBuffer(VkExtent2D extent,float x, float y, float z, float ar);
+            void updateUniformBuffer(VkExtent2D extent, Camera2D *camera, float ar);
             GameObjectBuffer(VkPhysicalDevice pDevice, VkDevice device, VkQueue graphics, VkCommandPool pool);
             ~GameObjectBuffer();
         

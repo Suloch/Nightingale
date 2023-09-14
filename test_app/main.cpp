@@ -18,8 +18,9 @@ int main(){
         // create a gameobject 
 
         nge::GameObject *bg_object = new nge::GameObject("bg", height/2, width/2);    
-        // bg_object->transform->scaleX = 0.5;
-        // bg_object->transform->scaleY = 0.5;
+        // bg_object->transform->z = -00;
+        // bg_object->transform->scaleX = 20;
+        // bg_object->transform->scaleY = 20;
 
         // bg_object->transform->x = 100;
         // bg_object->transform->y = 100;

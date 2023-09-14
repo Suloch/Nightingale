@@ -2,7 +2,7 @@
 
 #include "gameobject/gameobject.hpp"
 #include "render/renderer/render.hpp"
-
+#include "gameobject/camera.hpp"
 
 #include<map>
 #include<string>
@@ -25,7 +25,8 @@ namespace nge{
         public:
             Physics2D physic2d;
             const int MAX_FRAMES_IN_FLIGHT = 2;
-
+            Camera2D *camera;
+            
             std::map<std::string, Scene> scenes;
             
             Nightingale(int height, int width, const char* name);
@@ -34,6 +35,7 @@ namespace nge{
             void run();
             void createTexture(const char* name, const char*filepath);
             void loadScene(std::string name);
+
             
         private:
             std::map<std::string, Texture *> textures;

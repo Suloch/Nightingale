@@ -49,7 +49,6 @@ nge::Collision2D* nge::testBox_Box(nge::BoxCollider2D* b1, nge::BoxCollider2D* b
     float ydiff = b1->height/2 + b2->height/2 - std::abs(distY) ;
     
     if( xdiff > 0  && ydiff > 0){
-        Logger::getInstance().log("collided");
         return new Collision2D(b1, b2, distX, ydiff);
         
     }

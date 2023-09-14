@@ -76,6 +76,8 @@ nge::Nightingale::Nightingale(int height, int width, const char* name){
         renderpass,
         command->pool
     );
+
+    this->camera = new Camera2D(this->device->extent.height, this->device->extent.width);
     
 }
 
@@ -111,7 +113,7 @@ nge::Nightingale::~Nightingale(){
     
     delete device;
 
-    
+    delete camera;
 
 }
 
@@ -148,7 +150,7 @@ void nge::Nightingale::loadScene(std::string name){
 void nge::Nightingale::run(){
     currentFrame = 1; 
     float x = 0;
-    float y = 0.0000000001;
+    float y = 0;
     float z = 1.5;
     float k = -100;
     float l = 0 ;
@@ -156,31 +158,31 @@ void nge::Nightingale::run(){
 
         glfwPollEvents();
         if(glfwGetKey(window->window, GLFW_KEY_W) == GLFW_PRESS){
-            k+=10;
+            x+=0.1;
         }
         if(glfwGetKey(window->window, GLFW_KEY_S) == GLFW_PRESS){
-            k-=10;
+            x-=0.1;
         }
         if(glfwGetKey(window->window, GLFW_KEY_D) == GLFW_PRESS){
-            l+=10;
+            y+=0.1;
         }
         if(glfwGetKey(window->window, GLFW_KEY_A) == GLFW_PRESS){
-            l-=10;
+            y-=0.1;
         }
         // scenes["default"].gameObjects[6]->transform->scaleX = k;
         // scenes["default"].gameObjects[6]->transform->x = l;
         // scenes["default"].gameObjects[6]->transform->y = k;
         // Logger::getInstance().log(l, ": ", k);
-        
+        camera->setPosition(y, x);
         ImGui_ImplVulkan_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
-        ImGui::ShowDemoWindow();
+        // ImGui::ShowDemoWindow();
         ImGui::Render();
         ImDrawData* drawData = ImGui::GetDrawData();
 
         for(auto buffer: buffers){
-            buffer->updateUniformBuffer(device->extent, x, y, z, textures[buffer->texture]->getAspectRatio());
+            buffer->updateUniformBuffer(device->extent, camera, textures[buffer->texture]->getAspectRatio());
         }
         renderBuffer(
             window,
