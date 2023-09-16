@@ -5,17 +5,27 @@
 #include "imgui_impl_vulkan.h"
 #include "imgui_impl_glfw.h"
 #include <vector>
+#include "../../gameobject/gameobject.hpp"
+#include "../../render/texture/texture.hpp"
+
 namespace nge
 {
+    
     class Interface{
         private:
             VkDevice device;
             static ImGui_ImplVulkanH_Window g_MainWindowData;
 	        VkDescriptorPool imguiPool;
 
+            std::map<std::string, Texture *> textures;
+            std::vector<GameObject *> gameObjects;
+
             void showFileMenu();
-            void showFileTree();
+            void showFileTree(std::map<std::string, Texture *> textures);
             void showLevelItems();
+            void showConsole();
+            
+            
         public:
             Interface(
                 VkDevice device, 
@@ -28,7 +38,7 @@ namespace nge
             );
             ~Interface();
 
-            void showEditorInterface(); 
+            void showEditorInterface(std::map<std::string, Texture *> textures, std::vector<GameObject *> gameObjects); 
             
     };
 } // namespace nge

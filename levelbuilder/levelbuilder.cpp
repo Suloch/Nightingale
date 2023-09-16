@@ -14,7 +14,7 @@ nge::LevelBuilder::LevelBuilder(){
     app->setEditorMode(true);
     
     this->sceneName = "default";
-    app->loadScene("default");
+    app->loadScene(this->sceneName);
 
 
 }
@@ -37,6 +37,7 @@ void nge::LevelBuilder::runCommands(){
         switch (command.type)
         {
             case level::CREATE_TEXTURE:
+                this->app->createTexture(command.data[0].c_str(), command.data[1].c_str());
                 break;
             case level::NULL_COMMAND:
                 break;;

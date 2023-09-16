@@ -16,9 +16,9 @@ namespace nge
         class Command{
             public:
                 CommandTypeEnum type;
-                std::string data;
+                std::vector<std::string> data;
 
-                Command(CommandTypeEnum type, std::string data);
+                Command(CommandTypeEnum type, std::vector<std::string> data);
         };
 
         class CommandQueue{
@@ -27,7 +27,7 @@ namespace nge
                     static CommandQueue commandQueue;
                     return commandQueue;
                 }
-                void pushCommand(CommandTypeEnum type, std::string command);
+                void pushCommand(CommandTypeEnum type, std::vector<std::string> command);
                 Command getCommand();
             private:
                 std::vector<Command> commands;

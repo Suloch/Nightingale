@@ -7,6 +7,32 @@
 #include "../icons/IconsForkAwesome.h"
 #include "../../levelbuilder/commandqueue.hpp"
 #include "../logger/logger.hpp"
+#include <filesystem>
+
+struct DisplayPath{
+	std::string name;
+	std::string ext;
+	bool isDirectory;
+
+};
+
+std::vector<DisplayPath> get_items_in_current_directory(std::string path, std::vector<std::string> allowedExtensions){
+	std::vector<DisplayPath> items;
+    for (const auto & entry : std::filesystem::directory_iterator(path)){
+		DisplayPath d;
+		d.name = entry.path().filename();
+		d.ext = entry.path().extension();
+		d.isDirectory = entry.is_directory();
+
+		for(auto ext: allowedExtensions){
+			if(d.ext == ext || d.isDirectory ){
+				items.push_back(d);
+				break;
+			}
+		}
+	}
+    return items;
+}
 
 nge::Interface::Interface(
 	VkDevice device, 
@@ -99,7 +125,7 @@ nge::Interface::Interface(
 nge::Interface::~Interface(){
     vkDestroyDescriptorPool(device, this->imguiPool, nullptr);
     ImGui_ImplVulkan_Shutdown();
-	level::CommandQueue::getInstance().pushCommand(level::STOP_EXECUTE, "");
+	level::CommandQueue::getInstance().pushCommand(level::STOP_EXECUTE, {""});
 }
 
 
@@ -107,6 +133,7 @@ void nge::Interface::showFileMenu(){
 	static bool enableSpriteSheetEditor = false;
 
 	if(ImGui::BeginMainMenuBar()){
+		ImGui::SetWindowFontScale(1.5);
 
 		if(ImGui::BeginMenu("File")){
 			ImGui::MenuItem("New");
@@ -135,19 +162,97 @@ void nge::Interface::showFileMenu(){
 	}
 }
 
-void nge::Interface::showFileTree(){
+void nge::Interface::showFileTree(std::map<std::string, Texture *> textures){
 
 	ImGuiWindowFlags windowFlags = 0;
 	windowFlags |= ImGuiWindowFlags_NoResize;
 	windowFlags |= ImGuiWindowFlags_NoCollapse;
 
-	ImGui::SetNextWindowPos(ImVec2(0.0f, 420.0f));
+	ImGui::SetNextWindowPos(ImVec2(0.0f, 440.0f));
 	ImGui::SetNextWindowSize(ImVec2(200.0f, 600.0f));
-
 	ImGui::Begin("Files", NULL, windowFlags);
+	ImGui::SetWindowFontScale(1.5);
+
 		if(ImGui::Button(ICON_FK_PLUS_SQUARE " Add new texture")){
-			level::CommandQueue::getInstance().pushCommand(level::CREATE_TEXTURE, "name data");
+			ImGui::OpenPopup("NewTexture");
 		}
+		static std::string selected = "";
+		//list existing files
+		for(auto tex: textures){
+			const bool is_selected = (selected == tex.first);
+			if (ImGui::Selectable((ICON_FK_FILE_IMAGE_O + tex.first).c_str(), is_selected))
+				selected = tex.first;
+		}
+		// if(ImGui::BeginListBox(" ")){
+		// }
+		// ImGui::EndListBox();
+		// start pop up for selecting files
+		ImVec2 center = ImGui::GetMainViewport()->GetCenter();
+        ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+		if(ImGui::BeginPopupModal("NewTexture", NULL, ImGuiWindowFlags_AlwaysAutoResize)){
+			static char buf[32] = "new_tex";
+			ImGui::InputText(" ", buf, IM_ARRAYSIZE(buf));
+
+			if(ImGui::Button(ICON_FK_FILE_IMAGE_O "Browse file")){
+				ImGui::OpenPopup("Browse Files");
+			}
+			ImVec2 center = ImGui::GetMainViewport()->GetCenter();
+        	ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+			
+			static std::string path = "./";
+			static std::string filename = "";
+			static bool directory = false;
+			std::string label = "Browse Files";
+			// if(path != "./"){
+			// 	label = filename;
+			// }
+			if(ImGui::BeginPopupModal(label.c_str(), NULL, ImGuiWindowFlags_AlwaysAutoResize)){
+				const bool is_selected = (filename == "..");
+				if (ImGui::Selectable(ICON_FK_FOLDER_O  "..", is_selected, ImGuiSelectableFlags_DontClosePopups)){
+					directory = true;
+					filename = "..";
+				}
+				for(auto item: get_items_in_current_directory(path, {".png"})){
+					const bool is_selected = (filename == item.name);
+					if(item.isDirectory){
+						if (ImGui::Selectable((ICON_FK_FOLDER_O + item.name).c_str(), is_selected, ImGuiSelectableFlags_DontClosePopups)){
+							directory = true;
+							filename = item.name;
+						}
+					}else{
+						if (ImGui::Selectable( (ICON_FK_FILE_IMAGE_O + item.name).c_str(), is_selected, ImGuiSelectableFlags_DontClosePopups)){
+							directory = false;
+							filename = item.name;
+						}
+					}
+				}	
+				if (ImGui::Button("OK", ImVec2(120, 0))) {
+
+					if(directory){
+						path = path + filename + "/";
+					}else{
+						path = path + filename;
+				 		ImGui::CloseCurrentPopup(); 
+					}
+				}
+				ImGui::SetItemDefaultFocus();
+				ImGui::SameLine();
+				if (ImGui::Button("Cancel", ImVec2(120, 0))) { ImGui::CloseCurrentPopup(); }
+				ImGui::EndPopup();
+			}
+
+			if (ImGui::Button("OK", ImVec2(120, 0))) {
+				level::CommandQueue::getInstance().pushCommand(level::CREATE_TEXTURE, {buf, path});
+				path = "./";
+				 ImGui::CloseCurrentPopup(); 
+			}
+            ImGui::SetItemDefaultFocus();
+            ImGui::SameLine();
+            if (ImGui::Button("Cancel", ImVec2(120, 0))) { ImGui::CloseCurrentPopup(); }
+			ImGui::EndPopup();
+		}
+	
+		
 	ImGui::End();
 }
 
@@ -159,12 +264,13 @@ void nge::Interface::showLevelItems(){
 	windowFlags |= ImGuiWindowFlags_NoResize;
 	windowFlags |= ImGuiWindowFlags_NoCollapse;
 
-	ImGui::SetNextWindowPos(ImVec2(0.0f, 19.0f));
+	ImGui::SetNextWindowPos(ImVec2(0.0f, 30.0f));
 	ImGui::SetNextWindowSize(ImVec2(200.0f, 400.0f));
 
 	ImGui::SetNextItemWidth(ImGui::GetFontSize() * 20);
 
 	ImGui::Begin("Level", NULL, windowFlags);
+	ImGui::SetWindowFontScale(1.5);
 		if(ImGui::Button("Add")){
 			objectList.push_back("Object"+ std::to_string(objectList.size()));
 		}
@@ -174,11 +280,12 @@ void nge::Interface::showLevelItems(){
 	ImGui::End();
 }
 
+void nge::Interface::showConsole(){}
 
-void nge::Interface::showEditorInterface(){
-
+void nge::Interface::showEditorInterface(std::map<std::string, Texture *> textures, std::vector<GameObject *> gameObjects){
 		showFileMenu();
-		showFileTree();		
+		showFileTree(textures);		
+		showConsole();
 		showLevelItems();		
 
 }

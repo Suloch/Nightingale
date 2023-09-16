@@ -181,9 +181,9 @@ void nge::Nightingale::run(){
 
 
         if(this->editorMode){
-            interface->showEditorInterface();
+            interface->showEditorInterface(textures, scenes["default"].gameObjects);
         }
-        ImGui::ShowDemoWindow();
+        // ImGui::ShowDemoWindow();
 
         ImGui::Render();
         ImDrawData* drawData = ImGui::GetDrawData();
@@ -211,6 +211,7 @@ void nge::Nightingale::run(){
 }
 
 void nge::Nightingale::createTexture(const char* name, const char* filepath){
+    Logger::getInstance().log(name, "   ", filepath);
     Texture *t = new Texture(command->pool, device->graphics, device->physical, device->device, name, filepath);
     textures[name] = t;
 }
