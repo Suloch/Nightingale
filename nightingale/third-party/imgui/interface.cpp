@@ -5,9 +5,8 @@
 #include <GLFW/glfw3.h>
 #include "../../render/utils.hpp"
 #include "../icons/IconsForkAwesome.h"
-
-#include<iostream>
-#include<filesystem>
+#include "../../levelbuilder/commandqueue.hpp"
+#include "../logger/logger.hpp"
 
 nge::Interface::Interface(
 	VkDevice device, 
@@ -100,7 +99,7 @@ nge::Interface::Interface(
 nge::Interface::~Interface(){
     vkDestroyDescriptorPool(device, this->imguiPool, nullptr);
     ImGui_ImplVulkan_Shutdown();
-
+	level::CommandQueue::getInstance().pushCommand(level::STOP_EXECUTE, "");
 }
 
 
@@ -147,7 +146,7 @@ void nge::Interface::showFileTree(){
 
 	ImGui::Begin("Files", NULL, windowFlags);
 		if(ImGui::Button(ICON_FK_PLUS_SQUARE " Add new texture")){
-			
+			level::CommandQueue::getInstance().pushCommand(level::CREATE_TEXTURE, "name data");
 		}
 	ImGui::End();
 }

@@ -22,7 +22,7 @@ INC_DIRS := $(shell find $(SRC_DIR) -type d)
 INC_FLAGS := $(addprefix -I,$(INC_DIRS))
 
 CFLAGS = -std=c++2a -O2
-LDFLAGS = -lglfw -lvulkan -ldl -lpthread -lX11 -lXxf86vm -lXrandr -lXi
+LDFLAGS = -lglfw -lvulkan -ldl -lpthread -lX11 -lXxf86vm -lXrandr -lXi -lsqlite3
 
 CPPFLAGS := $(INC_FLAGS) $(CFLAGS) $(LDFLAGS) -MMD -MP -g
 
