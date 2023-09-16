@@ -27,6 +27,7 @@ namespace nge{
             const int MAX_FRAMES_IN_FLIGHT = 2;
             Camera2D *camera;
             
+
             std::map<std::string, Scene> scenes;
             
             Nightingale(int height, int width, const char* name);
@@ -35,7 +36,7 @@ namespace nge{
             void run();
             void createTexture(const char* name, const char*filepath);
             void loadScene(std::string name);
-
+            void setEditorMode(bool value);
             
         private:
             std::map<std::string, Texture *> textures;
@@ -52,6 +53,7 @@ namespace nge{
 
             int currentFrame = 0;
             const char *name;
+            bool editorMode;
 
     };
     

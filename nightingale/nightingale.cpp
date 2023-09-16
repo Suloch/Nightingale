@@ -6,7 +6,7 @@
 
 #include<thread>
 #include<chrono>
-
+#include "third-party/icons/IconsMaterialDesignIcons.h"
 
 nge::Nightingale::Nightingale(int height, int width, const char* name){
     // init logger
@@ -169,15 +169,22 @@ void nge::Nightingale::run(){
         if(glfwGetKey(window->window, GLFW_KEY_A) == GLFW_PRESS){
             y-=0.1;
         }
-        // scenes["default"].gameObjects[6]->transform->scaleX = k;
-        // scenes["default"].gameObjects[6]->transform->x = l;
-        // scenes["default"].gameObjects[6]->transform->y = k;
-        // Logger::getInstance().log(l, ": ", k);
         camera->setPosition(y, x);
+        
+
+        ImGuiIO& io = ImGui::GetIO(); (void)io;
+        
         ImGui_ImplVulkan_NewFrame();
         ImGui_ImplGlfw_NewFrame();
+
         ImGui::NewFrame();
-        // ImGui::ShowDemoWindow();
+
+
+        if(this->editorMode){
+            interface->showEditorInterface();
+        }
+        ImGui::ShowDemoWindow();
+
         ImGui::Render();
         ImDrawData* drawData = ImGui::GetDrawData();
 
@@ -198,7 +205,7 @@ void nge::Nightingale::run(){
         );
         physic2d.step(std::chrono::milliseconds(20).count()/100.0f);
         
-        std::this_thread::sleep_for(std::chrono::milliseconds(20));
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
         currentFrame = (currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
     }
 }
@@ -218,4 +225,9 @@ nge::Scene::~Scene(){
     for(auto gameobject: gameObjects){
         delete gameobject;
     }
+}
+
+
+void nge::Nightingale::setEditorMode(bool val){
+    this->editorMode = val;
 }

@@ -7,12 +7,12 @@ CFLAGS = -Wall
 BUILD_DIR = ./build
 
 ENGINE_DIR := ./nightingale
-APP_DIR := ./test_app
+APP_DIR := ./levelbuilder
 
 SRC_DIR := $(ENGINE_DIR) $(APP_DIR)
 
 
-SRCS := $(shell find $(SRC_DIRS) -name '*.cpp' )
+SRCS := $(shell find $(SRC_DIR) -name '*.cpp' )
 
 
 OBJS := $(SRCS:%=$(BUILD_DIR)/%.o)
@@ -47,5 +47,8 @@ shader:
 	glslc $(ENGINE_DIR)/shader/shader.vert -o $(BUILD_DIR)/$(ENGINE_DIR)/shader/vert.spv
 	glslc $(ENGINE_DIR)/shader/shader.frag -o $(BUILD_DIR)/$(ENGINE_DIR)/shader/frag.spv
 
-
 -include $(DEPS)
+
+
+
+

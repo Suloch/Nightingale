@@ -13,6 +13,9 @@ namespace nge
             static ImGui_ImplVulkanH_Window g_MainWindowData;
 	        VkDescriptorPool imguiPool;
 
+            void showFileMenu();
+            void showFileTree();
+            void showLevelItems();
         public:
             Interface(
                 VkDevice device, 
@@ -24,6 +27,8 @@ namespace nge
                 VkCommandPool commandPool
             );
             ~Interface();
+
+            void showEditorInterface(); 
             
     };
 } // namespace nge
