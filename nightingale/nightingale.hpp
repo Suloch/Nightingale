@@ -35,6 +35,7 @@ namespace nge{
 
             void run();
             void createTexture(const char* name, const char*filepath);
+            void createObject(std::string name);
             void loadScene(std::string name);
             void setEditorMode(bool value);
             
@@ -54,6 +55,8 @@ namespace nge{
             int currentFrame = 0;
             const char *name;
             bool editorMode;
+            
+            void handleCommands();
 
     };
     

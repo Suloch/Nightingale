@@ -20,31 +20,9 @@ nge::LevelBuilder::LevelBuilder(){
 }
 
 void nge::LevelBuilder::run(){
-    commandThread= std::thread(&LevelBuilder::runCommands, this);
     app->run();
 }
 
 nge::LevelBuilder::~LevelBuilder(){
     delete app;
-    commandThread.join();
-}
-
-
-void nge::LevelBuilder::runCommands(){
-    level::Command command = level::CommandQueue::getInstance().getCommand();
-
-    while(true){
-        switch (command.type)
-        {
-            case level::CREATE_TEXTURE:
-                this->app->createTexture(command.data[0].c_str(), command.data[1].c_str());
-                break;
-            case level::NULL_COMMAND:
-                break;;
-            case level::STOP_EXECUTE:
-                return;
-        }
-        command = level::CommandQueue::getInstance().getCommand();
-    }
-
 }

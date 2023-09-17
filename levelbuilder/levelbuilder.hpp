@@ -8,7 +8,6 @@ namespace nge{
         Nightingale *app;
         int height;
         int width;
-        std::thread commandThread;
         std::string sceneName;
         
         void runCommands();

@@ -22,7 +22,7 @@ namespace nge
 
             void showFileMenu();
             void showFileTree(std::map<std::string, Texture *> textures);
-            void showLevelItems();
+            void showLevelItems(std::vector<GameObject *> gameObjects);
             void showConsole();
             
             

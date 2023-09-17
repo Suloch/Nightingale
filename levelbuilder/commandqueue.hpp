@@ -10,6 +10,7 @@ namespace nge
         enum CommandTypeEnum{
             NULL_COMMAND,
             CREATE_TEXTURE,
+            CREATE_OBJECT,
             STOP_EXECUTE
         };
 

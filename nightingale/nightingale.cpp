@@ -3,11 +3,11 @@
 #include "logger/logger.hpp"
 #include "renderer/pass/renderpass.hpp"
 #include "third-party/imgui/interface.hpp"
+#include "../levelbuilder/commandqueue.hpp"
+
 
 #include<thread>
 #include<chrono>
-#include "third-party/icons/IconsMaterialDesignIcons.h"
-
 nge::Nightingale::Nightingale(int height, int width, const char* name){
     // init logger
     Logger::getInstance().start(nge::debug, "log.txt");
@@ -181,7 +181,10 @@ void nge::Nightingale::run(){
 
 
         if(this->editorMode){
+
             interface->showEditorInterface(textures, scenes["default"].gameObjects);
+            handleCommands();
+
         }
         // ImGui::ShowDemoWindow();
 
@@ -231,4 +234,36 @@ nge::Scene::~Scene(){
 
 void nge::Nightingale::setEditorMode(bool val){
     this->editorMode = val;
+}
+
+
+void nge::Nightingale::createObject(std::string name){
+
+    GameObject * gameobject = new GameObject(name, device->extent.height/2 ,device->extent.width/2);
+    scenes["default"].gameObjects.push_back(gameobject);
+    gameobject->id = scenes["default"].gameObjects.size();
+    // GameObjectBuffer *buffer = new GameObjectBuffer(
+    //                 device->physical,
+    //                 device->device,
+    //                 device->graphics,
+    //                 command->pool
+    //             );
+    
+    // buffers.push_back(buffer);
+
+}
+
+void nge::Nightingale::handleCommands(){
+    level::Command command = level::CommandQueue::getInstance().getCommand();
+    switch (command.type)
+    {   case level::CREATE_TEXTURE:
+            createTexture(command.data[0].c_str(), command.data[1].c_str());
+            break;
+        case level::NULL_COMMAND:
+            break;
+        case level::CREATE_OBJECT:
+            createObject(command.data[0]);
+        case level::STOP_EXECUTE:
+            return;
+    }
 }

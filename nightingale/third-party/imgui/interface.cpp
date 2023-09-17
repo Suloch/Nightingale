@@ -257,8 +257,7 @@ void nge::Interface::showFileTree(std::map<std::string, Texture *> textures){
 }
 
 
-void nge::Interface::showLevelItems(){
-	static std::vector<std::string> objectList;
+void nge::Interface::showLevelItems(std::vector<GameObject *> gameObjects){
 
 	ImGuiWindowFlags windowFlags = 0;
 	windowFlags |= ImGuiWindowFlags_NoResize;
@@ -271,12 +270,19 @@ void nge::Interface::showLevelItems(){
 
 	ImGui::Begin("Level", NULL, windowFlags);
 	ImGui::SetWindowFontScale(1.5);
-		if(ImGui::Button("Add")){
-			objectList.push_back("Object"+ std::to_string(objectList.size()));
-		}
-		for(auto a: objectList){
-			ImGui::Text(a.c_str());
-		}
+
+
+	if(ImGui::Button("Add")){
+		// objectList.push_back("Object"+ std::to_string(objectList.size()));
+		level::CommandQueue::getInstance().pushCommand(level::CREATE_OBJECT, {"Object"});
+	}
+	static GameObject *selected = nullptr;
+	for(auto object: gameObjects){
+		const bool is_selected = (selected != nullptr && selected->id == object->id);
+
+		if (ImGui::Selectable((ICON_FK_WRENCH + object->name).c_str(), is_selected))
+			selected = object;
+	}
 	ImGui::End();
 }
 
@@ -286,6 +292,6 @@ void nge::Interface::showEditorInterface(std::map<std::string, Texture *> textur
 		showFileMenu();
 		showFileTree(textures);		
 		showConsole();
-		showLevelItems();		
+		showLevelItems(gameObjects);		
 
 }

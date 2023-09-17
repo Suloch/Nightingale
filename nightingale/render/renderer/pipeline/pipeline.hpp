@@ -21,6 +21,8 @@ namespace nge{
 
         public:
             VkDescriptorSetLayout dSet;
+            VkDescriptorSetLayout smaplerDescriptorSetLayout;
+            VkDescriptorSetLayout uboDescriptorSetLayout;
             VkPipelineLayout layout;
             PipelineLayout(VkDevice device);
             ~PipelineLayout();

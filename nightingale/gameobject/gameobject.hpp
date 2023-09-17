@@ -15,7 +15,8 @@ namespace nge{
     
     class GameObject{
         public:
-
+            unsigned int id;
+            
             Transform2D *transform;
             Mesh2D mesh;
             float texScale;
