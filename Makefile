@@ -7,7 +7,7 @@ CFLAGS = -Wall
 BUILD_DIR = ./build
 
 ENGINE_DIR := ./nightingale
-APP_DIR := ./levelbuilder
+APP_DIR := ./test_app
 
 SRC_DIR := $(ENGINE_DIR) $(APP_DIR)
 

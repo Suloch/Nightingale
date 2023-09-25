@@ -8,10 +8,10 @@
 
 int main(){
     // create the instance which create a default scene
-    const int height = 600;
-    const int width = 800;
+    const int height = 768;
+    const int width = 1376;
 
-    nge::Nightingale app =  nge::Nightingale(600, 800, "Test");
+    nge::Nightingale app =  nge::Nightingale(height, width, "Test");
 
     
     // create background
@@ -91,6 +91,7 @@ int main(){
 
 
         app.createTexture("character_idle", "textures/Idle-Sheet.png");
+        app.createTexture("character_jump", "textures/Jump-End-Sheet.png");
     // create character
         // create gameobject for the character
         nge::GameObject *character = new nge::GameObject("character", height/2, width/2);

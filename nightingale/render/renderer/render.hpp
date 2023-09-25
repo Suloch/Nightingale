@@ -9,6 +9,15 @@
 #include "../../third-party/imgui/interface.hpp"
 
 namespace nge{
+    struct UpdateTexture
+    {
+        std::string texture;
+        std::string object;
+        GameObject *buffer;
+        int no;
+    };
+
+    
     void renderBuffer(Window *window,
     Device *device, 
     Command *command,
@@ -16,9 +25,11 @@ namespace nge{
     Pipeline *pipeline, 
     VkRenderPass renderPass,
     std::vector<GameObjectBuffer *> buffers,
-    std::map<std::string, VkDescriptorSet> dSets,
+    std::map<std::string, std::vector<VkDescriptorSet>> dSets,
     int currentFrame,
-    ImDrawData *drawData
+    ImDrawData *drawData,
+    std::map<std::string, Texture *> textures,
+     std::vector<UpdateTexture> *uts
 
     );
 
@@ -29,9 +40,10 @@ namespace nge{
         VkCommandBuffer cBuffer,  
         VkRenderPass renderPass,
         std::vector<GameObjectBuffer *> buffers,
-        std::map<std::string, VkDescriptorSet> dSets,
+        std::map<std::string, std::vector<VkDescriptorSet>> dSets,
         uint32_t imageIndex,
-        ImDrawData *drawData
+        ImDrawData *drawData,
+        int currentFrame
     );
 
     void reCreateSwapChain(

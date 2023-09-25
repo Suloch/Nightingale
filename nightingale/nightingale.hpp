@@ -19,6 +19,8 @@ namespace nge{
             const char *name;
     };
 
+    
+    
     class Nightingale{
     
 
@@ -26,7 +28,7 @@ namespace nge{
             Physics2D physic2d;
             const int MAX_FRAMES_IN_FLIGHT = 2;
             Camera2D *camera;
-            
+            bool changed = false;
 
             std::map<std::string, Scene> scenes;
             
@@ -34,14 +36,16 @@ namespace nge{
             ~Nightingale();
 
             void run();
+            void updateTexture(std::string name);
             void createTexture(const char* name, const char*filepath);
             void createObject(std::string name);
             void loadScene(std::string name);
             void setEditorMode(bool value);
             
         private:
+            std::vector<UpdateTexture> uts;
             std::map<std::string, Texture *> textures;
-            std::map<std::string, VkDescriptorSet> dSets;
+            std::map<std::string, std::vector<VkDescriptorSet>> dSets;
             std::vector<GameObjectBuffer *> buffers;
             std::map<std::string, Pipeline *> pipelines;
             Device *device;

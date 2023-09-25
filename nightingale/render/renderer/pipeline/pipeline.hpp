@@ -36,6 +36,7 @@ namespace nge{
             std::vector<VkSemaphore> imageAvailableSemaphores;
             std::vector<VkSemaphore> renderFinishedSemaphores;
             std::vector<VkFence> inFlightFences;
+            std::vector<VkFence> updateDsetFences;
 
             SyncObjects(int frames, VkDevice device);
             ~SyncObjects();

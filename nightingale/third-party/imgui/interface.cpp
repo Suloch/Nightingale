@@ -180,8 +180,11 @@ void nge::Interface::showFileTree(std::map<std::string, Texture *> textures){
 		//list existing files
 		for(auto tex: textures){
 			const bool is_selected = (selected == tex.first);
-			if (ImGui::Selectable((ICON_FK_FILE_IMAGE_O + tex.first).c_str(), is_selected))
+			if (ImGui::Selectable((ICON_FK_FILE_IMAGE_O + tex.first).c_str(), is_selected)){
 				selected = tex.first;
+
+				level::CommandQueue().getInstance().pushCommand(level::UPDATE_TEXTURE, {tex.first});
+			}
 		}
 		// if(ImGui::BeginListBox(" ")){
 		// }

@@ -134,9 +134,10 @@ void nge::Nightingale::loadScene(std::string name){
                 buffer->texture = object->properties["texture"];
                 buffer->object = object;
                 buffers.push_back(buffer);
-
-                dSets[object->name] = createDescriptorset(device->device, dPool, pipelineLayout->dSet);
-                updateDescriptorSet(device->device, dSets[object->name], textures[buffer->texture], buffer->uniformBuffer);
+                for(int i = 0; i < MAX_FRAMES_IN_FLIGHT; i++){
+                    dSets[object->name].push_back(createDescriptorset(device->device, dPool, pipelineLayout->dSet));
+                    updateDescriptorSet(device->device, dSets[object->name][i], textures[buffer->texture], buffer->uniformBuffer);
+                }
 
             }
 
@@ -158,16 +159,16 @@ void nge::Nightingale::run(){
 
         glfwPollEvents();
         if(glfwGetKey(window->window, GLFW_KEY_W) == GLFW_PRESS){
-            x+=0.1;
-        }
-        if(glfwGetKey(window->window, GLFW_KEY_S) == GLFW_PRESS){
             x-=0.1;
         }
+        if(glfwGetKey(window->window, GLFW_KEY_S) == GLFW_PRESS){
+            x+=0.1;
+        }
         if(glfwGetKey(window->window, GLFW_KEY_D) == GLFW_PRESS){
-            y+=0.1;
+            y-=0.1;
         }
         if(glfwGetKey(window->window, GLFW_KEY_A) == GLFW_PRESS){
-            y-=0.1;
+            y+=0.1;
         }
         camera->setPosition(y, x);
         
@@ -194,6 +195,7 @@ void nge::Nightingale::run(){
         for(auto buffer: buffers){
             buffer->updateUniformBuffer(device->extent, camera, textures[buffer->texture]->getAspectRatio());
         }
+
         renderBuffer(
             window,
             device,
@@ -204,8 +206,12 @@ void nge::Nightingale::run(){
             buffers,
             dSets,
             currentFrame,
-            drawData
+            drawData,
+            textures,
+            &uts
         );
+        
+        
         physic2d.step(std::chrono::milliseconds(20).count()/100.0f);
         
         std::this_thread::sleep_for(std::chrono::milliseconds(10));
@@ -214,7 +220,6 @@ void nge::Nightingale::run(){
 }
 
 void nge::Nightingale::createTexture(const char* name, const char* filepath){
-    Logger::getInstance().log(name, "   ", filepath);
     Texture *t = new Texture(command->pool, device->graphics, device->physical, device->device, name, filepath);
     textures[name] = t;
 }
@@ -263,7 +268,22 @@ void nge::Nightingale::handleCommands(){
             break;
         case level::CREATE_OBJECT:
             createObject(command.data[0]);
+            break;
+        case level::UPDATE_TEXTURE:
+            updateTexture(command.data[0]);
+            break;
         case level::STOP_EXECUTE:
             return;
     }
+}
+
+void nge::Nightingale::updateTexture(std::string name){
+    changed = true;
+    UpdateTexture ut;
+    ut.object = buffers[2]->object->name;
+    ut.no = 0;
+    ut.texture = name;
+    uts.push_back(ut);
+    // updateDescriptorSet(device->device, dSets[buffers[2]->object->name][currentFrame], textures["character_jump"], buffers[2]->uniformBuffer);
+
 }

@@ -11,6 +11,7 @@ namespace nge
             NULL_COMMAND,
             CREATE_TEXTURE,
             CREATE_OBJECT,
+            UPDATE_TEXTURE,
             STOP_EXECUTE
         };
 

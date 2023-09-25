@@ -11,12 +11,32 @@ void nge::renderBuffer(
     Pipeline *pipeline, 
     VkRenderPass renderPass,
     std::vector<GameObjectBuffer *> buffers,
-    std::map<std::string, VkDescriptorSet> dSets,
+    std::map<std::string, std::vector<VkDescriptorSet>> dSets,
     int currentFrame,
-    ImDrawData *drawData
+    ImDrawData *drawData,
+    std::map<std::string, Texture *> textures,
+    std::vector<UpdateTexture> *uts
 ){
-
     vkWaitForFences(device->device, 1, &pipeline->syncObjects->inFlightFences[currentFrame], VK_TRUE, UINT64_MAX);
+    static int change = 0;
+    // if(uts->size() > 0){
+    //     updateDescriptorSet(device->device, dSets[uts->at(0).object][currentFrame], textures[uts->at(0).texture], buffers[2]->uniformBuffer);
+    //     uts->at(0).no++;
+    //     if(uts->front().no == 2){
+    //         uts->clear();
+    //     }
+    // }
+
+    for(int i; i < uts->size(); i++){
+        Logger::getInstance().log(uts->at(i).texture, "  ",  uts->at(i).object);
+        updateDescriptorSet(device->device, dSets[uts->at(i).object][currentFrame], textures[uts->at(i).texture], buffers[2]->uniformBuffer);
+
+        uts->at(i).no++;
+        if(uts->at(i).no == 2){
+            uts->erase(uts->begin() + i);
+        }
+    }
+
     uint32_t imageIndex;
 
     VkResult result = vkAcquireNextImageKHR(
@@ -27,14 +47,15 @@ void nge::renderBuffer(
         VK_NULL_HANDLE, 
         &imageIndex)
     ;
-
-
+    
     if (result == VK_ERROR_OUT_OF_DATE_KHR) {
         reCreateSwapChain(window, device, renderPass);
         return ;
     } else if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR) {
         throw std::runtime_error("failed to acquire swap chain image!");
     }
+
+
     vkResetFences(device->device, 1,  &pipeline->syncObjects->inFlightFences[currentFrame]);
     vkResetCommandBuffer(command->buffers[currentFrame], /*VkCommandBufferResetFlagBits*/ 0);
     recordCommandBuffer(
@@ -46,7 +67,8 @@ void nge::renderBuffer(
         buffers,
         dSets,
         imageIndex,
-        drawData
+        drawData,
+        currentFrame
     );
 
 
@@ -99,9 +121,10 @@ void nge::recordCommandBuffer(
     VkCommandBuffer cBuffer,  
     VkRenderPass renderPass,
     std::vector<GameObjectBuffer *> buffers,
-    std::map<std::string, VkDescriptorSet> dSets,
+    std::map<std::string, std::vector<VkDescriptorSet>> dSets,
     uint32_t imageIndex,
-    ImDrawData *drawData
+    ImDrawData *drawData,
+    int currentFrame
 ){
 
     VkCommandBufferBeginInfo beginInfo{};
@@ -149,7 +172,7 @@ void nge::recordCommandBuffer(
         VkDeviceSize offsets[] = {0};
         vkCmdBindVertexBuffers(cBuffer, 0, 1, vertexBuffers, offsets);
         vkCmdBindIndexBuffer(cBuffer, buffer->indexBuffer, 0, VK_INDEX_TYPE_UINT16);
-        vkCmdBindDescriptorSets(cBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout->layout, 0, 1, &dSets[buffer->object->name], 0, nullptr);
+        vkCmdBindDescriptorSets(cBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout->layout, 0, 1, &dSets[buffer->object->name][currentFrame], 0, nullptr);
         Vertex2 temp{};
         temp.zoom = glm::float32(3);
         vkCmdPushConstants(cBuffer, pipelineLayout->layout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(Vertex2), &temp);
