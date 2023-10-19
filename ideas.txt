@@ -4,3 +4,10 @@
 7. make 2 descriptorset layout 1 for sampler and other for uniform buffer
 9. basic input manager
 10. create sqllite integeration
+
+
+--------------------------
+Todo: bug fixes for changes for gameobject structure changes
+
+1. need either modify the function updateUniformBuffer to accept transform or make this function part of the gameobject
+2. Need to handle the iteration of the new gameobjects inside the interface

@@ -16,6 +16,7 @@ nge::GameObject::GameObject(std::string name, int height, int width){
     this->flipX = 1;
     this->flipY = 1;
     name = name;
+    buffer = nullptr;
 }
 
 void nge::GameObject::setTexScale(float scale, float offsetX, float offsetY){
@@ -27,4 +28,5 @@ void nge::GameObject::setTexScale(float scale, float offsetX, float offsetY){
 
 nge::GameObject::~GameObject(){
     delete transform;
+    delete buffer;
 }

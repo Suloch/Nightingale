@@ -5,7 +5,6 @@
 #include<array>
 #include<vector>
 #include<string>
-#include "../../gameobject/gameobject.hpp"
 #include "../../gameobject/camera.hpp"
 
 
@@ -73,7 +72,6 @@ namespace nge{
 
             std::string texture;
             
-            GameObject *object;
 
             void updateUniformBuffer(VkExtent2D extent, Camera2D *camera, float ar);
             GameObjectBuffer(VkPhysicalDevice pDevice, VkDevice device, VkQueue graphics, VkCommandPool pool);

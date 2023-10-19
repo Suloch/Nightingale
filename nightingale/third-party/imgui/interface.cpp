@@ -183,7 +183,7 @@ void nge::Interface::showFileTree(std::map<std::string, Texture *> textures){
 			if (ImGui::Selectable((ICON_FK_FILE_IMAGE_O + tex.first).c_str(), is_selected)){
 				selected = tex.first;
 
-				level::CommandQueue().getInstance().pushCommand(level::UPDATE_TEXTURE, {tex.first});
+				level::CommandQueue().getInstance().pushCommand(level::UPDATE_TEXTURE, {tex.first, });
 			}
 		}
 		// if(ImGui::BeginListBox(" ")){

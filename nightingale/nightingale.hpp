@@ -14,7 +14,8 @@ namespace nge{
             Scene(){}
             Scene(const char* name);
             ~Scene();
-            std::vector<GameObject *> gameObjects;
+            void addGameObject(GameObject *);
+            std::map<std::string, GameObject *> gameObjects;
         private:
             const char *name;
     };
@@ -36,17 +37,17 @@ namespace nge{
             ~Nightingale();
 
             void run();
-            void updateTexture(std::string name);
+            void updateTexture(std::string texName, std::string objId);
             void createTexture(const char* name, const char*filepath);
             void createObject(std::string name);
             void loadScene(std::string name);
             void setEditorMode(bool value);
             
         private:
+            std::string currentSceneName;
             std::vector<UpdateTexture> uts;
             std::map<std::string, Texture *> textures;
             std::map<std::string, std::vector<VkDescriptorSet>> dSets;
-            std::vector<GameObjectBuffer *> buffers;
             std::map<std::string, Pipeline *> pipelines;
             Device *device;
             Window *window;

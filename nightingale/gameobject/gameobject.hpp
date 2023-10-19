@@ -3,7 +3,7 @@
 #include <map>
 #include <string>
 #include "../physics2D/physics2D.hpp"
-
+#include "../render/renderer/buffer/buffer.hpp"
 namespace nge{
 
     struct Mesh2D
@@ -26,7 +26,8 @@ namespace nge{
             int flipY;
             std::map<std::string, std::string> properties;
             std::string name;
-
+            GameObjectBuffer *buffer;
+            
             GameObject(std::string name, int height, int width);
             ~GameObject();
             void setTexScale(float scale, float x, float y);

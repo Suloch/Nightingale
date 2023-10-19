@@ -34,7 +34,7 @@ int main(){
         bg_object->properties["texture"] = "bg_tex";
 
         // add object to the scene
-        app.scenes["default"].gameObjects.push_back(bg_object);
+        app.scenes["default"].addGameObject(bg_object);
         
     // create platform
         // create gameobject for the platform
@@ -74,7 +74,7 @@ int main(){
         tile1->transform->x = 0;
         tile1->transform->y = 100;
         tile1->properties["texture"] = "build_main";
-        app.scenes["default"].gameObjects.push_back(tile1);
+        app.scenes["default"].addGameObject(tile1);
 
         nge::RigidBody2D * platRB = app.physic2d.addRigidBody2D(tile1->transform);     
         platRB->dynamic = false;
@@ -107,7 +107,7 @@ int main(){
         // add the texture property
         character->properties["texture"] = "character_idle";
 
-        app.scenes["default"].gameObjects.push_back(character);
+        app.scenes["default"].addGameObject(character);
 
         nge::RigidBody2D* rb =  app.physic2d.addRigidBody2D(character->transform);
         app.physic2d.addBoxCollider2D(

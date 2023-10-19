@@ -10,7 +10,7 @@ void nge::renderBuffer(
     PipelineLayout *pipelineLayout, 
     Pipeline *pipeline, 
     VkRenderPass renderPass,
-    std::vector<GameObjectBuffer *> buffers,
+    std::map<std::string, GameObject *> gameObjects,
     std::map<std::string, std::vector<VkDescriptorSet>> dSets,
     int currentFrame,
     ImDrawData *drawData,
@@ -18,18 +18,10 @@ void nge::renderBuffer(
     std::vector<UpdateTexture> *uts
 ){
     vkWaitForFences(device->device, 1, &pipeline->syncObjects->inFlightFences[currentFrame], VK_TRUE, UINT64_MAX);
-    static int change = 0;
-    // if(uts->size() > 0){
-    //     updateDescriptorSet(device->device, dSets[uts->at(0).object][currentFrame], textures[uts->at(0).texture], buffers[2]->uniformBuffer);
-    //     uts->at(0).no++;
-    //     if(uts->front().no == 2){
-    //         uts->clear();
-    //     }
-    // }
 
     for(int i; i < uts->size(); i++){
         Logger::getInstance().log(uts->at(i).texture, "  ",  uts->at(i).object);
-        updateDescriptorSet(device->device, dSets[uts->at(i).object][currentFrame], textures[uts->at(i).texture], buffers[2]->uniformBuffer);
+        updateDescriptorSet(device->device, dSets[uts->at(i).object][currentFrame], textures[uts->at(i).texture], uts->at(i).buffer->uniformBuffer);
 
         uts->at(i).no++;
         if(uts->at(i).no == 2){
@@ -64,7 +56,7 @@ void nge::renderBuffer(
         pipeline,
         command->buffers[currentFrame],
         renderPass,
-        buffers,
+        gameObjects,
         dSets,
         imageIndex,
         drawData,
@@ -120,7 +112,7 @@ void nge::recordCommandBuffer(
     Pipeline *pipeline, 
     VkCommandBuffer cBuffer,  
     VkRenderPass renderPass,
-    std::vector<GameObjectBuffer *> buffers,
+    std::map<std::string, GameObject *> gameObjects,
     std::map<std::string, std::vector<VkDescriptorSet>> dSets,
     uint32_t imageIndex,
     ImDrawData *drawData,
@@ -167,12 +159,13 @@ void nge::recordCommandBuffer(
     int i = 0;
     
 
-    for(auto buffer: buffers){
+    for(auto mapObject: gameObjects){
+        auto buffer = mapObject.second->buffer;
         VkBuffer vertexBuffers[] = {buffer->vertexBuffer};
         VkDeviceSize offsets[] = {0};
         vkCmdBindVertexBuffers(cBuffer, 0, 1, vertexBuffers, offsets);
         vkCmdBindIndexBuffer(cBuffer, buffer->indexBuffer, 0, VK_INDEX_TYPE_UINT16);
-        vkCmdBindDescriptorSets(cBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout->layout, 0, 1, &dSets[buffer->object->name][currentFrame], 0, nullptr);
+        vkCmdBindDescriptorSets(cBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout->layout, 0, 1, &dSets[mapObject.second->name][currentFrame], 0, nullptr);
         Vertex2 temp{};
         temp.zoom = glm::float32(3);
         vkCmdPushConstants(cBuffer, pipelineLayout->layout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(Vertex2), &temp);
