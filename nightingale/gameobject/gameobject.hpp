@@ -28,6 +28,8 @@ namespace nge{
             std::string name;
             GameObjectBuffer *buffer;
             
+            void updateUniformBuffer(VkExtent2D extent, Camera2D *camera, float aspectRatio);
+            
             GameObject(std::string name, int height, int width);
             ~GameObject();
             void setTexScale(float scale, float x, float y);

@@ -73,7 +73,6 @@ namespace nge{
             std::string texture;
             
 
-            void updateUniformBuffer(VkExtent2D extent, Camera2D *camera, float ar);
             GameObjectBuffer(VkPhysicalDevice pDevice, VkDevice device, VkQueue graphics, VkCommandPool pool);
             ~GameObjectBuffer();
         

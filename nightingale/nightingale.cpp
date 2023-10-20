@@ -185,7 +185,7 @@ void nge::Nightingale::run(){
         ImDrawData* drawData = ImGui::GetDrawData();
 
         for(auto object: scenes[currentSceneName].gameObjects){
-            object.second->buffer->updateUniformBuffer(device->extent, camera, textures[object.second->buffer->texture]->getAspectRatio());
+            object.second->updateUniformBuffer(device->extent, camera, textures[object.second->buffer->texture]->getAspectRatio());
         }
 
         renderBuffer(
