@@ -9,5 +9,5 @@
 --------------------------
 Todo: bug fixes for changes for gameobject structure changes
 
-1. need either modify the function updateUniformBuffer to accept transform or make this function part of the gameobject
+1. Need to check for the cleanup of the gameobjectbuffer
 2. Need to handle the iteration of the new gameobjects inside the interface

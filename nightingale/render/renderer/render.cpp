@@ -20,7 +20,6 @@ void nge::renderBuffer(
     vkWaitForFences(device->device, 1, &pipeline->syncObjects->inFlightFences[currentFrame], VK_TRUE, UINT64_MAX);
 
     for(int i; i < uts->size(); i++){
-        Logger::getInstance().log(uts->at(i).texture, "  ",  uts->at(i).object);
         updateDescriptorSet(device->device, dSets[uts->at(i).object->name][currentFrame], textures[uts->at(i).texture], uts->at(i).object->buffer->uniformBuffer);
 
         uts->at(i).no++;

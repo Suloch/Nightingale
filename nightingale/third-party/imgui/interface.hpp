@@ -16,13 +16,14 @@ namespace nge
             VkDevice device;
             static ImGui_ImplVulkanH_Window g_MainWindowData;
 	        VkDescriptorPool imguiPool;
-
+	        GameObject *selectedGameObject = nullptr;
+            std::string selectedTexture = "";
             std::map<std::string, Texture *> textures;
             std::vector<GameObject *> gameObjects;
 
             void showFileMenu();
             void showFileTree(std::map<std::string, Texture *> textures);
-            void showLevelItems(std::vector<GameObject *> gameObjects);
+            void showLevelItems(std::map<std::string, GameObject *> gameObjects);
             void showConsole();
             
             
@@ -38,7 +39,7 @@ namespace nge
             );
             ~Interface();
 
-            void showEditorInterface(std::map<std::string, Texture *> textures, std::vector<GameObject *> gameObjects); 
+            void showEditorInterface(std::map<std::string, Texture *> textures, std::map<std::string, GameObject *> gameObjects); 
             
     };
 } // namespace nge

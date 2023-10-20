@@ -82,6 +82,7 @@ nge::Nightingale::Nightingale(int height, int width, const char* name){
 }
 
 nge::Nightingale::~Nightingale(){
+
     vkDeviceWaitIdle(device->device);
     delete interface;
     for(auto &texture: textures){
@@ -175,7 +176,7 @@ void nge::Nightingale::run(){
 
         if(this->editorMode){
 
-            // interface->showEditorInterface(textures, scenes["default"].gameObjects);
+            interface->showEditorInterface(textures, scenes["default"].gameObjects);
             handleCommands();
 
         }
@@ -223,7 +224,9 @@ nge::Scene::Scene(const char *name){
 }
 
 nge::Scene::~Scene(){
+    Logger::getInstance().log("Deleting the game object buffers");
     for(auto gameobject: gameObjects){
+        Logger::getInstance().log("Deleted ", gameobject.second->name, " ", gameobject.second->id);
         delete gameobject.second;
     }
 }
@@ -267,10 +270,11 @@ void nge::Nightingale::handleCommands(){
 }
 
 void nge::Nightingale::updateTexture(std::string texName, std::string objId){
+
     changed = true;
     UpdateTexture ut;
     ut.object = this->scenes[currentSceneName].gameObjects[objId];
     ut.no = 0;
-    ut.texture = name;
+    ut.texture = texName;
     uts.push_back(ut);
 }

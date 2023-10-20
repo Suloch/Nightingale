@@ -176,14 +176,12 @@ void nge::Interface::showFileTree(std::map<std::string, Texture *> textures){
 		if(ImGui::Button(ICON_FK_PLUS_SQUARE " Add new texture")){
 			ImGui::OpenPopup("NewTexture");
 		}
-		static std::string selected = "";
 		//list existing files
 		for(auto tex: textures){
-			const bool is_selected = (selected == tex.first);
+			const bool is_selected = (this->selectedTexture == tex.first);
 			if (ImGui::Selectable((ICON_FK_FILE_IMAGE_O + tex.first).c_str(), is_selected)){
-				selected = tex.first;
-
-				level::CommandQueue().getInstance().pushCommand(level::UPDATE_TEXTURE, {tex.first, });
+				this->selectedTexture = tex.first;
+				level::CommandQueue().getInstance().pushCommand(level::UPDATE_TEXTURE, {tex.first, std::to_string(this->selectedGameObject->id)});
 			}
 		}
 		// if(ImGui::BeginListBox(" ")){
@@ -260,7 +258,7 @@ void nge::Interface::showFileTree(std::map<std::string, Texture *> textures){
 }
 
 
-void nge::Interface::showLevelItems(std::vector<GameObject *> gameObjects){
+void nge::Interface::showLevelItems(std::map<std::string, GameObject *> gameObjects){
 
 	ImGuiWindowFlags windowFlags = 0;
 	windowFlags |= ImGuiWindowFlags_NoResize;
@@ -279,19 +277,19 @@ void nge::Interface::showLevelItems(std::vector<GameObject *> gameObjects){
 		// objectList.push_back("Object"+ std::to_string(objectList.size()));
 		level::CommandQueue::getInstance().pushCommand(level::CREATE_OBJECT, {"Object"});
 	}
-	static GameObject *selected = nullptr;
-	for(auto object: gameObjects){
-		const bool is_selected = (selected != nullptr && selected->id == object->id);
+	for(auto mapObject: gameObjects){
+		auto object = mapObject.second;
+		const bool is_selected = (this->selectedGameObject != nullptr && this->selectedGameObject->id == object->id);
 
 		if (ImGui::Selectable((ICON_FK_WRENCH + object->name).c_str(), is_selected))
-			selected = object;
+			this->selectedGameObject = object;
 	}
 	ImGui::End();
 }
 
 void nge::Interface::showConsole(){}
 
-void nge::Interface::showEditorInterface(std::map<std::string, Texture *> textures, std::vector<GameObject *> gameObjects){
+void nge::Interface::showEditorInterface(std::map<std::string, Texture *> textures, std::map<std::string, GameObject *> gameObjects){
 		showFileMenu();
 		showFileTree(textures);		
 		showConsole();
