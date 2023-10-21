@@ -105,12 +105,19 @@ void nge::GameObjectBuffer::createIndexBuffer(VkPhysicalDevice pDevice, VkDevice
 }
 
 nge::GameObjectBuffer::~GameObjectBuffer(){
+    Logger::getInstance().log("destroying indexBuffer");
     vkDestroyBuffer(device, indexBuffer, nullptr);
+    Logger::getInstance().log("destroying vertexBuffer");
     vkDestroyBuffer(device, vertexBuffer, nullptr);
+    Logger::getInstance().log("destroying uniformBuffer");
     vkDestroyBuffer(device, uniformBuffer, nullptr);
+    Logger::getInstance().log("destroying indexMemory");
     vkFreeMemory(device, indexMemory, nullptr);
+    Logger::getInstance().log("destroying vertexMemory");
     vkFreeMemory(device, vertexMemory, nullptr);
+    Logger::getInstance().log("destroying uniformMemory");
     vkFreeMemory(device, uniformMemory, nullptr);
+    Logger::getInstance().log("destroyed every thing");
 
 }
 

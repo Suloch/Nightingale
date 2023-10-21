@@ -55,7 +55,7 @@ nge::Nightingale::Nightingale(int height, int width, const char* name){
     // syncObjects = new SyncObjects(MAX_FRAMES_IN_FLIGHT, device->device);
 
     // create a empty scene
-    scenes["default"] = Scene("default");
+    scenes["default"] = new Scene("default");
 
     // create the default pipeline
     pipelines["default"] = new Pipeline(
@@ -84,6 +84,10 @@ nge::Nightingale::Nightingale(int height, int width, const char* name){
 nge::Nightingale::~Nightingale(){
 
     vkDeviceWaitIdle(device->device);
+    for(auto scene: this->scenes){
+        delete scene.second;
+    }
+    
     delete interface;
     for(auto &texture: textures){
         delete texture.second;
@@ -112,7 +116,7 @@ nge::Nightingale::~Nightingale(){
 void nge::Nightingale::loadScene(std::string name){
     if(scenes.contains(name)){
         currentSceneName = name;
-        for(auto mapObject: scenes[name].gameObjects){
+        for(auto mapObject: scenes[name]->gameObjects){
             auto object = mapObject.second;
             // create physics properties
 
@@ -176,7 +180,7 @@ void nge::Nightingale::run(){
 
         if(this->editorMode){
 
-            interface->showEditorInterface(textures, scenes["default"].gameObjects);
+            interface->showEditorInterface(textures, scenes["default"]->gameObjects);
             handleCommands();
 
         }
@@ -185,7 +189,7 @@ void nge::Nightingale::run(){
         ImGui::Render();
         ImDrawData* drawData = ImGui::GetDrawData();
 
-        for(auto object: scenes[currentSceneName].gameObjects){
+        for(auto object: scenes[currentSceneName]->gameObjects){
             object.second->updateUniformBuffer(device->extent, camera, textures[object.second->buffer->texture]->getAspectRatio());
         }
 
@@ -196,7 +200,7 @@ void nge::Nightingale::run(){
             pipelineLayout,
             pipelines["default"],
             renderpass, 
-            scenes[currentSceneName].gameObjects,
+            scenes[currentSceneName]->gameObjects,
             dSets,
             currentFrame,
             drawData,
@@ -224,9 +228,9 @@ nge::Scene::Scene(const char *name){
 }
 
 nge::Scene::~Scene(){
-    Logger::getInstance().log("Deleting the game object buffers");
+    
+    Logger::getInstance().log("Deleting the game object buffers for: ", this->name, this->gameObjects.size());
     for(auto gameobject: gameObjects){
-        Logger::getInstance().log("Deleted ", gameobject.second->name, " ", gameobject.second->id);
         delete gameobject.second;
     }
 }
@@ -247,7 +251,7 @@ void nge::Scene::addGameObject(GameObject *object){
 void nge::Nightingale::createObject(std::string name){
 
     GameObject * gameobject = new GameObject(name, device->extent.height/2 ,device->extent.width/2);
-    scenes["default"].addGameObject(gameobject);
+    scenes["default"]->addGameObject(gameobject);
 }
 
 void nge::Nightingale::handleCommands(){
@@ -273,7 +277,7 @@ void nge::Nightingale::updateTexture(std::string texName, std::string objId){
 
     changed = true;
     UpdateTexture ut;
-    ut.object = this->scenes[currentSceneName].gameObjects[objId];
+    ut.object = this->scenes[currentSceneName]->gameObjects[objId];
     ut.no = 0;
     ut.texture = texName;
     uts.push_back(ut);

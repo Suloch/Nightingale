@@ -31,8 +31,10 @@ void nge::GameObject::setTexScale(float scale, float offsetX, float offsetY){
 
 
 nge::GameObject::~GameObject(){
+    Logger::getInstance().log("deleting the gameobject");
     delete transform;
     delete buffer;
+    Logger::getInstance().log("deleted the gameobject");
 }
 
 void nge::GameObject::updateUniformBuffer(VkExtent2D extent, Camera2D *camera, float ar){

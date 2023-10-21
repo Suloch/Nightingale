@@ -31,7 +31,7 @@ namespace nge{
             Camera2D *camera;
             bool changed = false;
 
-            std::map<std::string, Scene> scenes;
+            std::map<std::string, Scene *> scenes;
             
             Nightingale(int height, int width, const char* name);
             ~Nightingale();

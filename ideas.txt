@@ -7,7 +7,3 @@
 
 
 --------------------------
-Todo: bug fixes for changes for gameobject structure changes
-
-1. Need to check for the cleanup of the gameobjectbuffer
-2. Need to handle the iteration of the new gameobjects inside the interface
