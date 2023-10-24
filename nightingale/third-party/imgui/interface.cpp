@@ -289,10 +289,54 @@ void nge::Interface::showLevelItems(std::map<std::string, GameObject *> gameObje
 
 void nge::Interface::showConsole(){}
 
-void nge::Interface::showEditorInterface(std::map<std::string, Texture *> textures, std::map<std::string, GameObject *> gameObjects){
-		showFileMenu();
-		showFileTree(textures);		
-		showConsole();
-		showLevelItems(gameObjects);		
 
+void nge::Interface::showPropertiesPanel(){
+	if(this->selectedGameObject == nullptr)
+		return;
+	
+	ImGuiWindowFlags windowFlags = 0;
+	windowFlags |= ImGuiWindowFlags_NoResize;
+	windowFlags |= ImGuiWindowFlags_NoCollapse;
+
+	ImGui::SetNextWindowPos(ImVec2(1150.0f, 30.0f));
+	ImGui::SetNextWindowSize(ImVec2(200.0f, 600.0f));
+	ImGui::Begin("Properties", NULL, windowFlags);
+	ImGui::SetWindowFontScale(1.5);
+
+		char *cstr = selectedGameObject->name.data();
+        ImGui::InputText("##name", cstr , IM_ARRAYSIZE(cstr));
+
+        ImGui::SetItemTooltip("Object Name");
+
+        ImGui::SeparatorText("Position");
+
+		ImGui::InputFloat("X", &selectedGameObject->transform->x, 0.01f, 1.0f, "%.3f");
+
+		ImGui::InputFloat("Y", &selectedGameObject->transform->y , 0.01f, 1.0f, "%.3f");
+
+		static float z = selectedGameObject->transform->getX();
+		ImGui::InputFloat("Z", &z, 0.01f, 1.0f, "%.3f");
+
+		ImGui::SeparatorText("Scale");
+		static float sx = selectedGameObject->transform->scaleX;
+		ImGui::InputFloat("X", &sx, 0.01f, 1.0f, "%.3f");
+
+		static float sy = selectedGameObject->transform->scaleY;
+		ImGui::InputFloat("Y", &sy, 0.01f, 1.0f, "%.3f");
+
+
+		ImGui::SeparatorText("Texture");
+		
+
+	ImGui::End();
+
+}
+
+
+void nge::Interface::showEditorInterface(std::map<std::string, Texture *> textures, std::map<std::string, GameObject *> gameObjects){
+	showFileMenu();
+	showFileTree(textures);		
+	showConsole();
+	showLevelItems(gameObjects);		
+	showPropertiesPanel();
 }

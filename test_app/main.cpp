@@ -118,11 +118,6 @@ int main(){
             10,
             10
         );
-        // create rigid body for character
-
-
-        // add rigid body property
-        
 
     // load the scene
     app.loadScene("default");

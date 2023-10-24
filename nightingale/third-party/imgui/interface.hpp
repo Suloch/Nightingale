@@ -20,11 +20,12 @@ namespace nge
             std::string selectedTexture = "";
             std::map<std::string, Texture *> textures;
             std::vector<GameObject *> gameObjects;
-
+            
             void showFileMenu();
             void showFileTree(std::map<std::string, Texture *> textures);
             void showLevelItems(std::map<std::string, GameObject *> gameObjects);
             void showConsole();
+            void showPropertiesPanel();
             
             
         public:

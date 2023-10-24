@@ -184,7 +184,7 @@ void nge::Nightingale::run(){
             handleCommands();
 
         }
-        // ImGui::ShowDemoWindow();
+        ImGui::ShowDemoWindow();
 
         ImGui::Render();
         ImDrawData* drawData = ImGui::GetDrawData();
@@ -208,8 +208,8 @@ void nge::Nightingale::run(){
             &uts
         );
         
-        
-        physic2d.step(std::chrono::milliseconds(20).count()/100.0f);
+        if(!this->editorMode)
+            physic2d.step(std::chrono::milliseconds(20).count()/100.0f);
         
         std::this_thread::sleep_for(std::chrono::milliseconds(10));
         currentFrame = (currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
