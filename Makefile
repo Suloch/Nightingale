@@ -12,27 +12,26 @@ APP_DIR := ./test_app
 SRC_DIR := $(ENGINE_DIR) $(APP_DIR)
 
 
-SRCS := $(shell find $(SRC_DIRS) -name '*.cpp' )
+SRCS := $(shell find $(SRC_DIR) -name '*.cpp' )
 
 
 OBJS := $(SRCS:%=$(BUILD_DIR)/%.o)
 
-INC_DIRS := $(shell find $(SRC_DIRS) -type d)
+INC_DIRS := $(shell find $(SRC_DIR) -type d)
 
 INC_FLAGS := $(addprefix -I,$(INC_DIRS))
 
-CFLAGS = -std=c++17 -O2
-LDFLAGS = -lglfw -lvulkan -ldl -lpthread -lX11 -lXxf86vm -lXrandr -lXi
+CFLAGS = -std=c++2a -O2
+LDFLAGS = -lglfw -lvulkan -ldl -lpthread -lX11 -lXxf86vm -lXrandr -lXi -lsqlite3
 
 CPPFLAGS := $(INC_FLAGS) $(CFLAGS) $(LDFLAGS) -MMD -MP -g
 
 
 $(BUILD_DIR)/$(TARGET_EXEC): $(OBJS)
 	$(CXX) $(OBJS) -o $@ $(LDFLAGS)
-	mkdir -p $(BUILD_DIR)/$(ENGINE_DIR)/render/shader/default/
-	glslc $(ENGINE_DIR)/render/shader/default/shader.vert -o $(BUILD_DIR)/$(ENGINE_DIR)/render/shader/default/vert.spv
-	glslc $(ENGINE_DIR)/render/shader/default/shader.frag -o $(BUILD_DIR)/$(ENGINE_DIR)/render/shader/default/frag.spv
 
+test:
+	echo $(SRCS)
 
 # Build step for C++ source
 $(BUILD_DIR)/%.cpp.o: %.cpp
@@ -44,8 +43,12 @@ clean:
 	rm -r $(BUILD_DIR)
 
 shader:
-	glslc $(ENGINE_DIR)/render/shader/default/shader.vert -o $(BUILD_DIR)/$(ENGINE_DIR)/render/shader/default/vert.spv
-	glslc $(ENGINE_DIR)/render/shader/default/shader.frag -o $(BUILD_DIR)/$(ENGINE_DIR)/render/shader/default/frag.spv
-
+	mkdir -p $(BUILD_DIR)/$(ENGINE_DIR)/shader/
+	glslc $(ENGINE_DIR)/shader/shader.vert -o $(BUILD_DIR)/$(ENGINE_DIR)/shader/vert.spv
+	glslc $(ENGINE_DIR)/shader/shader.frag -o $(BUILD_DIR)/$(ENGINE_DIR)/shader/frag.spv
 
 -include $(DEPS)
+
+
+
+
